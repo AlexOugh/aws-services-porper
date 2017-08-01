@@ -1,0 +1,8 @@
+__*
+.DS_Store
+*.pyc
+!__init__.py
+*.local.*
+src/*
+!src/*.py
+src/six.py
