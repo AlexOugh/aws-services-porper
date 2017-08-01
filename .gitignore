@@ -6,3 +6,5 @@ __*
 src/*
 !src/*.py
 src/six.py
+samTemplate.yaml
+*.yaml1

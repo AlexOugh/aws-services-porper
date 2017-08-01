@@ -2,7 +2,7 @@
 swagger: "2.0"
 info:
   version: "2017-01-10T20:57:23Z"
-  title: "Cloudtrail API Interfaces"
+  title: "Porper API Interfaces"
 schemes:
 - "https"
 paths:
