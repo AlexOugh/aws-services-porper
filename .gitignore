@@ -2,9 +2,13 @@ __*
 .DS_Store
 *.pyc
 !__init__.py
-*.local.*
+*local.*
+!*local.sample*
 src/*
 !src/*.py
 src/six.py
 samTemplate.yaml
 *.yaml1
+samples/*
+!samples/*.py
+samples/six.py

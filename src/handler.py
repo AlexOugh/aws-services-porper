@@ -23,41 +23,12 @@ ALLOWED_RESOURCES = [
 
 def lambda_handler(event, context):
 
-    print 'Received event:\n%s', % json.dumps(event)
+    print 'Received event:\n%s' % json.dumps(event)
 
-    method = event['httpMethod'].lower()
-    paths = event['path'].split('/')
-    path = paths[len(paths)-1]
-    query_params = (event.get('queryStringParameters')) ? event['queryStringParameters'] : {}
-    if (query_params and isinstance(query_params, str)) query_params = json.loads(query_params)
-    post_data = (event.get('body')) ? event['body'] : {}
-    if (post_data and isinstance(post_data, str)) post_data = json.loads(post_data)
-    https_params = post_data;
-    if (method == 'get') https_params = query_params;
-
-    print 'path: %s', % path
-    resource = path
-    if resource not in ALLOWED_RESOURCES: raise Exception("not supported resource : %s" % resource)
-
-    print 'oper: %s', % https_params.get('params')
-    print 'parameters: %s', % https_params.get('params')
-
-    oper = https_params.get('oper')
-    print 'oper: %s', % https_params.get('oper')
-    if oper is None:
-        if method == 'get':
-            if params and params.get('id'):
-                oper = 'find_by_id'
-            else:
-                oper = 'find'
-        elif method == 'post':
-            oper = 'create'
-        elif method == 'put':
-            oper = 'update'
-        elif method = 'delete':
-            oper = 'delete'
-
-    params = https_params.get('params')
+    access_token = event.get('access_token')
+    resource = event['resource']
+    oper = event['oper']
+    params = json.loads(event['params'])
 
     import os
     import boto3
@@ -67,7 +38,6 @@ def lambda_handler(event, context):
     if isinstance(controller, AuthController):
         ret = getattr(controller, oper)(params)
     else:
-        access_token = event['headers']['authorization']
         ret = getattr(controller, oper)(access_token, params)
     print ret
     return ret

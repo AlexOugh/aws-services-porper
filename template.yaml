@@ -3,7 +3,7 @@ Transform: "AWS::Serverless-2016-10-31"
 Parameters:
   GoogleTokeninfoEndpoint:
     Type: String
-    Default: ""
+    Default: "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token="
     Description: Endpoint url to confirm Google tokens
   SsoHost:
     Type: String
@@ -22,13 +22,13 @@ Parameters:
     Type: String
     Default: ""
     Description: SSO Redirect Url
-  GithubAUthEndpoint:
+  GithubAuthEndpoint:
     Type: String
-    Default: ""
+    Default: "https://github.com/login/oauth"
     Description: Endpoint url to confirm GitHub tokens
   GithubApiEndpoint:
     Type: String
-    Default: ""
+    Default: "https://api.github.com"
     Description: GitHub API Endpoint url
   GithubClientId:
     Type: String
@@ -39,7 +39,131 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: GitHub Client Secret
+  GithubRedirectUri:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: GitHub Redirect Uri
+  ReadCapacityUnit:
+    Description: Read Capacity Unit for DynamoDB Tables
+    Type: Number
+    Default: 5
+  WriteCapacityUnit:
+    Description: Write Capacity Unit for DynamoDB Tables
+    Type: Number
+    Default: 5
 Resources:
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "users"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  GroupTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "groups"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  AccessTokenTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "access_tokens"
+      AttributeDefinitions:
+        -
+          AttributeName: "access_token"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "access_token"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  PermissionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "permissions"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  InvitedUserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "invited_users"
+      AttributeDefinitions:
+        -
+          AttributeName: "email"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "email"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  UserGroupTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "user_group_rels"
+      AttributeDefinitions:
+        -
+          AttributeName: "user_id"
+          AttributeType: "S"
+        -
+          AttributeName: "group_id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "user_id"
+          KeyType: "HASH"
+        -
+          AttributeName: "group_id"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  OrderTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName : "orders"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
   EncryptionDecryptionKey:
     Type: AWS::KMS::Key
     Properties:
@@ -123,6 +247,22 @@ Resources:
   ProxyFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Handler: api_handler.lambda_handler
+      Runtime: python2.7
+      CodeUri: ./src
+      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Events:
+        ProxyApiGreedy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /{proxy+}
+            Method: ANY
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Porper
       Handler: handler.lambda_handler
       Runtime: python2.7
       CodeUri: ./src
@@ -135,19 +275,13 @@ Resources:
           SSO_USER: !Ref SsoUser
           SSO_PASSWORD: !Ref SsoPassword
           SSO_REDIRECT_URI: !Ref SsoRedirectUri
-          GITHUB_AUTH_ENDPOINT: !Ref GithubAUthEndpoint
+          GITHUB_AUTH_ENDPOINT: !Ref GithubAuthEndpoint
           GITHUB_API_ENDPOINT: !Ref GithubApiEndpoint
           GITHUB_CLIENT_ID: !Ref GithubClientId
           GITHUB_CLIENT_SECRET: !Ref GithubClientSecret
+          GITHUB_REDIRECT_URI: !Ref GithubRedirectUri
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
-      Events:
-        ProxyApiGreedy:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /{proxy+}
-            Method: ANY
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
@@ -161,3 +295,6 @@ Outputs:
   ProxyLambdaFunctionArn:
     Description: "Proxy Lambda Function ARN"
     Value: !GetAtt ProxyFunction.Arn
+  LambdaFunctionArn:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt LambdaFunction.Arn
