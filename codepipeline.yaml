@@ -1,0 +1,329 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudformation to Set up a Project CodePipeline along with CodeBuild
+
+Parameters:
+  GitHubSourceRepositoryOwner:
+    Type: String
+    Default: SungardAS
+    Description: Owner of the Source Repository in GitHub
+  GitHubSourceRepositoryName:
+    Type: String
+    Default: aws-services-porper
+    Description: Name of the Source Repository in GitHub
+  GitHubSourceRepositoryBranch:
+    Type: String
+    Default: master
+    Description: Branch of the Source Repository in GitHub
+  GitHubPersonalAccessToken:
+    Type: String
+    NoEcho: true
+    Description: Personal Access Token to Access GitHub Repository
+  GoogleTokeninfoEndpoint:
+    Type: String
+    Default: "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token="
+    Description: Endpoint url to confirm Google tokens
+  SsoHost:
+    Type: String
+    Default: ""
+    Description: SSO Host Name
+  SsoUser:
+    Type: String
+    Default: ""
+    Description: SSO User Name
+  SsoPassword:
+    Type: String
+    Default: ""
+    NoEcho: true
+    Description: SSO Password
+  SsoRedirectUri:
+    Type: String
+    Default: ""
+    Description: SSO Redirect Url
+  GithubAuthEndpoint:
+    Type: String
+    Default: "https://github.com/login/oauth"
+    Description: Endpoint url to confirm GitHub tokens
+  GithubApiEndpoint:
+    Type: String
+    Default: "https://api.github.com"
+    Description: GitHub API Endpoint url
+  GithubClientId:
+    Type: String
+    Default: ""
+    Description: GitHub Client Id
+  GithubClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: GitHub Client Secret
+  GithubRedirectUri:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: GitHub Redirect Uri
+  ReadCapacityUnit:
+    Description: Read Capacity Unit for DynamoDB Tables
+    Type: Number
+    Default: 5
+  WriteCapacityUnit:
+    Description: Write Capacity Unit for DynamoDB Tables
+    Type: Number
+    Default: 5
+  ProjectImage:
+    Type: String
+    Default: "aws/codebuild/python:2.7.12"
+    Description: Implemented Programming Language
+
+Resources:
+  CodeBuildServiceRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - "codebuild.amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource:
+                      - !Join
+                        - ''
+                        - - "arn:aws:logs:"
+                          - !Ref AWS::Region
+                          - ":"
+                          - !Ref AWS::AccountId
+                          - ":log-group:/aws/codebuild/*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "s3:GetObject"
+                      - "s3:GetObjectVersion"
+                      - "s3:PutObject"
+                    Resource:
+                      - !Join
+                        - ''
+                        - - "arn:aws:s3:::"
+                          - !Ref InputArtifactS3Bucket
+                          - "/*"
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Join
+          - '-'
+          - - !Ref GitHubSourceRepositoryOwner
+            - !Ref GitHubSourceRepositoryName
+            - "build"
+      Description: CodeBuild for a Project
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: !Ref ProjectImage
+        EnvironmentVariables:
+        - Name: S3_BUCKET_NAME
+          Value: !Ref InputArtifactS3Bucket
+        - Name: AWS_DEFAULT_REGION
+          Value: !Ref AWS::Region
+        - Name: AWS_ACCOUNT_ID
+          Value: !Ref AWS::AccountId
+      Source:
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 60
+  InputArtifactS3Bucket:
+    Type: "AWS::S3::Bucket"
+
+  CodePipelineServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "AllowCodePipelineServiceToAssumeRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "codepipeline.amazonaws.com"
+          -
+            Sid: "AllowCloudformationServiceToAssumeRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "cloudformation.amazonaws.com"
+      Policies:
+        -
+          PolicyName: "InlinePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "*"
+                Resource: "*"
+  CodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      Name: !Join
+          - '-'
+          - - !Ref GitHubSourceRepositoryOwner
+            - !Ref GitHubSourceRepositoryName
+            - "pipeline"
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      Stages:
+        -
+          Name: Source
+          Actions:
+            -
+              Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              OutputArtifacts:
+                -
+                  Name: MyApp
+              Configuration:
+                Owner: !Ref GitHubSourceRepositoryOwner
+                Repo: !Ref GitHubSourceRepositoryName
+                Branch: !Ref GitHubSourceRepositoryBranch
+                OAuthToken: !Ref GitHubPersonalAccessToken
+              RunOrder: 1
+        -
+          Name: Build
+          Actions:
+            -
+              Name: CodeBuild
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              InputArtifacts:
+                -
+                  Name: MyApp
+              OutputArtifacts:
+                -
+                  Name: MyAppBuild
+              Configuration:
+                ProjectName: !Ref CodeBuild
+              RunOrder: 1
+        -
+          Name: Deploy
+          Actions:
+            -
+              Name: ChangeSetBuild
+              InputArtifacts:
+                -
+                  Name: MyAppBuild
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                ChangeSetName: !Join
+                    - '-'
+                    - - !Ref GitHubSourceRepositoryOwner
+                      - !Ref GitHubSourceRepositoryName
+                      - "changeset"
+                RoleArn: !GetAtt CodePipelineServiceRole.Arn
+                Capabilities: CAPABILITY_IAM
+                StackName: !Join
+                    - '-'
+                    - - !Ref GitHubSourceRepositoryOwner
+                      - !Ref GitHubSourceRepositoryName
+                ParameterOverrides: !Join
+                    - ''
+                    - - '{ '
+                      - '"GoogleTokeninfoEndpoint": "'
+                      - !Ref GoogleTokeninfoEndpoint
+                      - '", '
+                      - '"SsoHost": "'
+                      - !Ref SsoHost
+                      - '", '
+                      - '"SsoUser": "'
+                      - !Ref SsoUser
+                      - '", '
+                      - '"SsoPassword": "'
+                      - !Ref SsoPassword
+                      - '", '
+                      - '"SsoRedirectUri": "'
+                      - !Ref SsoRedirectUri
+                      - '", '
+                      - '"GithubAuthEndpoint": "'
+                      - !Ref GithubAuthEndpoint
+                      - '", '
+                      - '"GithubApiEndpoint": "'
+                      - !Ref GithubApiEndpoint
+                      - '", '
+                      - '"GithubClientId": "'
+                      - !Ref GithubClientId
+                      - '", '
+                      - '"GithubClientSecret": "'
+                      - !Ref GithubClientSecret
+                      - '", '
+                      - '"GithubRedirectUri": "'
+                      - !Ref GithubRedirectUri
+                      - '", '
+                      - '"ReadCapacityUnit": "'
+                      - !Ref ReadCapacityUnit
+                      - '", '
+                      - '"WriteCapacityUnit": "'
+                      - !Ref WriteCapacityUnit
+                      - '" }'
+                TemplatePath: MyAppBuild::samTemplate.yaml
+              RunOrder: 1
+            -
+              Name: ChangeSetExecute
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: !Join
+                    - '-'
+                    - - !Ref GitHubSourceRepositoryOwner
+                      - !Ref GitHubSourceRepositoryName
+                ChangeSetName: !Join
+                    - '-'
+                    - - !Ref GitHubSourceRepositoryOwner
+                      - !Ref GitHubSourceRepositoryName
+                      - "changeset"
+              RunOrder: 2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref InputArtifactS3Bucket
+
+Outputs:
+  ArtifactS3BucketName:
+    Description: S3 Bucket Name to Store Artifacts
+    Value: !Ref InputArtifactS3Bucket

@@ -247,11 +247,26 @@ Resources:
   ProxyFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: SungardAS-Porper-Proxy
       Handler: api_handler.lambda_handler
       Runtime: python2.7
       CodeUri: ./src
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
+      Environment:
+        Variables:
+          GOOGLE_TOKENINFO_ENDPOINT: !Ref GoogleTokeninfoEndpoint
+          SSO_HOST: !Ref SsoHost
+          SSO_USER: !Ref SsoUser
+          SSO_PASSWORD: !Ref SsoPassword
+          SSO_REDIRECT_URI: !Ref SsoRedirectUri
+          GITHUB_AUTH_ENDPOINT: !Ref GithubAuthEndpoint
+          GITHUB_API_ENDPOINT: !Ref GithubApiEndpoint
+          GITHUB_CLIENT_ID: !Ref GithubClientId
+          GITHUB_CLIENT_SECRET: !Ref GithubClientSecret
+          GITHUB_REDIRECT_URI: !Ref GithubRedirectUri
+          KMS_REGION: !Ref 'AWS::Region'
+          KMS_KEY_ID: !Ref EncryptionDecryptionKey
       Events:
         ProxyApiGreedy:
           Type: Api
