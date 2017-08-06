@@ -73,6 +73,10 @@ Parameters:
     Type: String
     Default: "aws/codebuild/python:2.7.12"
     Description: Implemented Programming Language
+  S3SharedBucketName:
+    Type: String
+    Default: ""
+    Description: S3 Bucket Name where the Artifact of this Build will be Copied
 
 Resources:
   CodeBuildServiceRole:
@@ -122,6 +126,16 @@ Resources:
                         - - "arn:aws:s3:::"
                           - !Ref InputArtifactS3Bucket
                           - "/*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "s3:*"
+                    Resource:
+                      - !Join
+                        - ''
+                        - - "arn:aws:s3:::"
+                          - !Ref S3SharedBucketName
+                          - "/*"
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -145,6 +159,8 @@ Resources:
           Value: !Ref AWS::Region
         - Name: AWS_ACCOUNT_ID
           Value: !Ref AWS::AccountId
+        - Name: S3_SHARED_BUCKET_NAME
+          Value: !Ref S3SharedBucketName
       Source:
         Type: CODEPIPELINE
       TimeoutInMinutes: 60
