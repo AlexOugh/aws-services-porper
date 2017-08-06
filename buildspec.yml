@@ -2,6 +2,7 @@ version: 0.1
 phases:
   install:
     commands:
+      - pip install --upgrade --user awscli
       - pip install shyaml
       - cd src; pip install porper -t .; cd ..
   build:
