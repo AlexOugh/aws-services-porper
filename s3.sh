@@ -34,7 +34,10 @@
 # OR use "codepipeline_with_shared_bucket.yaml" cloudformation when building its pipeline stack
 
 
-# make lambda zip file public
-aws s3 cp `cat samTemplate.yaml | shyaml get-value Resources.ProxyFunction.Properties.CodeUri` s3://$S3_SHARED_BUCKET_NAME  --acl public-read
-# upload template file
-aws s3 cp ./samTemplate.yaml s3://$S3_SHARED_BUCKET_NAME/samTemplate.yaml --acl public-read
+if [ "$S3_SHARED_BUCKET_NAME" != "" ];
+then
+  # make lambda zip file public
+  aws s3 cp `cat samTemplate.yaml | shyaml get-value Resources.ProxyFunction.Properties.CodeUri` s3://$S3_SHARED_BUCKET_NAME  --acl public-read
+  # upload template file
+  aws s3 cp ./samTemplate.yaml s3://$S3_SHARED_BUCKET_NAME/samTemplate.yaml --acl public-read
+fi

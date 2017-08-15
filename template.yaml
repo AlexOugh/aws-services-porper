@@ -44,6 +44,33 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: GitHub Redirect Uri
+  SlackAuthEndpoint:
+    Type: String
+    Default: "https://slack.com/oauth"
+    Description: Endpoint url to confirm Slack tokens
+  SlackApiEndpoint:
+    Type: String
+    Default: "https://slack.com/api"
+    Description: Slack API Endpoint url
+  SlackClientId:
+    Type: String
+    Default: ""
+    Description: Slack Client Id
+  SlackClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Slack Client Secret
+  SlackSlashCommandToken:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Slack Token for Slash Command
+  SlackLegacyToken:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Slack Legacy Token for SDK
   ReadCapacityUnit:
     Description: Read Capacity Unit for DynamoDB Tables
     Type: Number
@@ -121,10 +148,16 @@ Resources:
         -
           AttributeName: "email"
           AttributeType: "S"
+        -
+          AttributeName: "auth_type"
+          AttributeType: "S"
       KeySchema:
         -
           AttributeName: "email"
           KeyType: "HASH"
+        -
+          AttributeName: "auth_type"
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref ReadCapacityUnit
         WriteCapacityUnits: !Ref WriteCapacityUnit
@@ -149,10 +182,10 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref ReadCapacityUnit
         WriteCapacityUnits: !Ref WriteCapacityUnit
-  OrderTable:
+  AWSAccountTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "orders"
+      TableName : "aws_accounts"
       AttributeDefinitions:
         -
           AttributeName: "id"
@@ -240,38 +273,10 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
+      DefinitionUri: ./swagger.yaml
       StageName: Prod
-      DefinitionBody:
-          swagger: 2.0
-          info:
-            title:
-              Ref: AWS::StackName
-          paths:
-            /{proxy+}:
-              options:
-                consumes:
-                - "application/json"
-                produces:
-                - "application/json"
-                responses: {}
-                x-amazon-apigateway-integration:
-                  type: "mock"
-              x-amazon-apigateway-any-method:
-                produces:
-                - "application/json"
-                parameters:
-                - name: "proxy"
-                  in: "path"
-                  required: true
-                  type: "string"
-                x-amazon-apigateway-integration:
-                  httpMethod: "POST"
-                  type: "aws_proxy"
-                  uri:
-                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProxyFunction.Arn}/invocations
-                responses: {}
-          swagger: '2.0'
-
+      Variables:
+        LambdaFunctionName: !Ref ProxyFunction
   ProxyFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -293,6 +298,12 @@ Resources:
           GITHUB_CLIENT_ID: !Ref GithubClientId
           GITHUB_CLIENT_SECRET: !Ref GithubClientSecret
           GITHUB_REDIRECT_URI: !Ref GithubRedirectUri
+          SLACK_AUTH_ENDPOINT: !Ref SlackAuthEndpoint
+          SLACK_API_ENDPOINT: !Ref SlackApiEndpoint
+          SLACK_CLIENT_ID: !Ref SlackClientId
+          SLACK_CLIENT_SECRET: !Ref SlackClientSecret
+          SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
+          SLACK_LEGACY_TOKEN: !Ref SlackLegacyToken
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
       Events:
@@ -323,6 +334,12 @@ Resources:
           GITHUB_CLIENT_ID: !Ref GithubClientId
           GITHUB_CLIENT_SECRET: !Ref GithubClientSecret
           GITHUB_REDIRECT_URI: !Ref GithubRedirectUri
+          SLACK_AUTH_ENDPOINT: !Ref SlackAuthEndpoint
+          SLACK_API_ENDPOINT: !Ref SlackApiEndpoint
+          SLACK_CLIENT_ID: !Ref SlackClientId
+          SLACK_CLIENT_SECRET: !Ref SlackClientSecret
+          SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
+          SLACK_LEGACY_TOKEN: !Ref SlackLegacyToken
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
 Outputs:

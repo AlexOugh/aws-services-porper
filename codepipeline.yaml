@@ -61,6 +61,33 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: GitHub Redirect Uri
+  SlackAuthEndpoint:
+    Type: String
+    Default: "https://slack.com/oauth"
+    Description: Endpoint url to login
+  SlackApiEndpoint:
+    Type: String
+    Default: "https://slack.com/api"
+    Description: Slack API Endpoint url
+  SlackClientId:
+    Type: String
+    Default: ""
+    Description: Slack Client Id
+  SlackClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Slack Client Secret
+  SlackSlashCommandToken:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Slack Token for Slash Command
+  SlackLegacyToken:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Slack Legacy Token for SDK
   ReadCapacityUnit:
     Description: Read Capacity Unit for DynamoDB Tables
     Type: Number
@@ -307,6 +334,24 @@ Resources:
                       - '", '
                       - '"GithubRedirectUri": "'
                       - !Ref GithubRedirectUri
+                      - '", '
+                      - '"SlackAuthEndpoint": "'
+                      - !Ref SlackAuthEndpoint
+                      - '", '
+                      - '"SlackApiEndpoint": "'
+                      - !Ref SlackApiEndpoint
+                      - '", '
+                      - '"SlackClientId": "'
+                      - !Ref SlackClientId
+                      - '", '
+                      - '"SlackClientSecret": "'
+                      - !Ref SlackClientSecret
+                      - '", '
+                      - '"SlackSlashCommandToken": "'
+                      - !Ref SlackSlashCommandToken
+                      - '", '
+                      - '"SlackLegacyToken": "'
+                      - !Ref SlackLegacyToken
                       - '", '
                       - '"ReadCapacityUnit": "'
                       - !Ref ReadCapacityUnit

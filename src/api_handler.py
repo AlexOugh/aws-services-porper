@@ -1,16 +1,19 @@
 
 import json
 import traceback
+from slash_handler import lambda_handler as slash_handler
 from handler import lambda_handler as handler
 
 ALLOWED_RESOURCES = [
     'github_auth',
     'google_auth',
+    'slack_auth',
     'sso_auth',
     'group',
     'user',
     'invited_user',
-    'order'
+    'aws_account',
+    'permission'
 ]
 
 def lambda_handler(event, context):
@@ -25,6 +28,9 @@ def lambda_handler(event, context):
     print 'paths: %s' % paths
     print 'path: %s' % path
     print 'res_type: %s' % res_type
+
+    if path == 'slash':
+        return slash_handler(event, context)
 
     resource = path
     if resource not in ALLOWED_RESOURCES:
@@ -68,6 +74,10 @@ def lambda_handler(event, context):
     access_token = event['headers'].get('Authorization')
     print 'access_token: %s' % access_token
 
+    # add 'access_token' to the params if the operation is 'authenticate' of auth controllers
+    if access_token and oper == 'authenticate':
+        params['access_token'] = access_token
+
     handler_event = {'access_token': access_token, 'resource': resource, 'oper': oper, 'params': json.dumps(params)}
 
     try:
@@ -91,9 +101,9 @@ def lambda_handler(event, context):
         else:
             status_code = 500
         response = { 'statusCode': status_code };
+        response['headers'] = { "Access-Control-Allow-Origin": "*" }
         if res_type and res_type == 'json':
             response['body'] = err_msg
         else:
-            response['headers'] = { "Access-Control-Allow-Origin": "*" }
             response['body'] = json.dumps(err_msg)
         return response

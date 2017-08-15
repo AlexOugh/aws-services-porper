@@ -4,12 +4,14 @@ import json
 from porper.controllers.auth_controller import AuthController
 from porper.controllers.github_auth_controller import GithubAuthController
 from porper.controllers.google_auth_controller import GoogleAuthController
+from porper.controllers.slack_auth_controller import SlackAuthController
 from porper.controllers.sso_auth_controller import SsoAuthController
 from porper.controllers.group_controller import GroupController
 from porper.controllers.user_controller import UserController
 from porper.controllers.invited_user_controller import InvitedUserController
+from porper.controllers.permission_controller import PermissionController
 
-from order_controller import OrderController
+from aws_account_controller import AwsAccountController
 
 def lambda_handler(event, context):
 

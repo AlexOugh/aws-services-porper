@@ -1,11 +1,11 @@
 
 from porper.controllers.resource_controller import ResourceController
 
-class OrderController(ResourceController):
+class AwsAccountController(ResourceController):
 
     def __init__(self, permission_connection):
         ResourceController.__init__(self, None, None, permission_connection)
-        self.resource = 'order'
+        self.resource = 'aws_account'
 
-        from order import Order
-        self.model = Order(permission_connection)
+        from aws_account import AwsAccount
+        self.model = AwsAccount(permission_connection)
