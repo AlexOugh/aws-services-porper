@@ -27,7 +27,7 @@ dynamodb = boto3.resource('dynamodb', region_name=region)
 auth_endpoint = os.environ.get('SLACK_AUTH_ENDPOINT')
 client_id = os.environ.get('SLACK_CLIENT_ID')
 slash_command_token = os.environ.get('SLACK_SLASH_COMMAND_TOKEN')
-legacy_token = os.environ.get('SLACK_LEGACY_TOKEN')
+#legacy_token = os.environ.get('SLACK_LEGACY_TOKEN')
 
 def lambda_handler(event, context):
 
