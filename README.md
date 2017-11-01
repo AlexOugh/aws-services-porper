@@ -63,19 +63,16 @@ Input Parameter Values
   (Only need the to do the first one. The second 2 steps are configured during this stack's creation)
 
 
-## Sungard Availability Services | Labs
-[![Sungard Availability Services | Labs][labs-image]][labs-github-url]
+## [![Sungard Availability Services | Labs][labs-logo]][labs-github-url]
 
-This project is maintained by the Labs team at [Sungard Availability
-Services][sungardas-url]
+This project is maintained by the Labs group at [Sungard Availability
+Services](http://sungardas.com)
 
-GitHub: [https://sungardas.github.io][sungardas-github-url]
+GitHub: [https://sungardas.github.io](https://sungardas.github.io)
 
-Blog: [http://blog.sungardas.com/CTOLabs/][sungardaslabs-blog-url]
+Blog:
+[http://blog.sungardas.com/CTOLabs/](http://blog.sungardas.com/CTOLabs/)
 
-[porper-api-url]: https://github.com/SungardAS/porper-api
 [labs-github-url]: https://sungardas.github.io
-[labs-image]: https://raw.githubusercontent.com/SungardAS/repo-assets/master/images/logos/sungardas-labs-logo-small.png
-[sungardas-github-url]: https://sungardas.github.io
-[sungardas-url]: http://sungardas.com
-[sungardaslabs-blog-url]: http://blog.sungardas.com/CTOLabs/
+[labs-logo]: https://raw.githubusercontent.com/SungardAS/repo-assets/master/images/logos/sungardas-labs-logo-small.png
+[aws-services-image]: ./docs/images/logo.png?raw=true
