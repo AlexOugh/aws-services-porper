@@ -57,10 +57,7 @@ def lambda_handler(event, context):
     print 'oper: %s' % oper
     if oper is None:
         if method == 'get':
-            if params and params.get('id'):
-                oper = 'find_by_id'
-            else:
-                oper = 'find'
+            oper = 'find'
         elif method == 'post':
             oper = 'create'
         elif method == 'put':

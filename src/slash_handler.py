@@ -117,16 +117,15 @@ def activate(user_id, team_id):
     attachments = [ { "text": '%s/authorize?client_id=%s&scope=identity.basic,identity.email' % (auth_endpoint, client_id) } ]
     return _send_response("Please connect to the link to activate your account", attachments)
 
-def add_account(user_id, team_id, account_id, account_name, account_description=None):
+def add_account(user_id, team_id, account_id, account_name, role_name, external_id):
 
-    if not account_description:
-        account_description = account_name
     print 'add_account'
     print 'user_id = %s' % user_id
     print 'team_id = %s' % team_id
     print 'account_id = %s' % account_id
     print 'account_name = %s' % account_name
-    print 'account_description = %s' % account_description
+    print 'role_name = %s' % role_name
+    print 'external_id = %s' % external_id
 
     if _authenticate(user_id, team_id) is None:
         print 'no user found with %s-%s' % (team_id, user_id)
@@ -134,7 +133,7 @@ def add_account(user_id, team_id, account_id, account_name, account_description=
 
     user_id = '%s-%s' % (team_id, user_id)
     aws_account_controller = AwsAccountController(dynamodb)
-    aws_account_controller.create_using_user_id(user_id, {"id": account_id, "name": account_name, "description": account_description})
+    aws_account_controller.create_using_user_id(user_id, {"id": account_id, "name": account_name, "role_name": role_name, "external_id": external_id})
 
     attachments = [ { "text": 'new account: %s - %s' % (account_id, account_name) } ]
     return _send_response("A new account is added", attachments)

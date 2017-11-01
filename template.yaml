@@ -66,11 +66,6 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: Slack Token for Slash Command
-  SlackLegacyToken:
-    Type: String
-    NoEcho: true
-    Default: ""
-    Description: Slack Legacy Token for SDK
   ReadCapacityUnit:
     Description: Read Capacity Unit for DynamoDB Tables
     Type: Number
@@ -303,7 +298,6 @@ Resources:
           SLACK_CLIENT_ID: !Ref SlackClientId
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
-          SLACK_LEGACY_TOKEN: !Ref SlackLegacyToken
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
       Events:
@@ -339,9 +333,52 @@ Resources:
           SLACK_CLIENT_ID: !Ref SlackClientId
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
-          SLACK_LEGACY_TOKEN: !Ref SlackLegacyToken
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
+
+  AuthorizerLambdaFunctionIAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - "lambda.amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource: "arn:aws:logs:*:*:*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "dynamodb:*"
+                    Resource: "*"
+  AuthorizerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Porper-Authorization
+      Handler: porper_authorizer.lambda_handler
+      Runtime: python2.7
+      CodeUri: ./src
+      Role: !GetAtt AuthorizerLambdaFunctionIAMRole.Arn
+      Timeout: 300
+
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
@@ -358,3 +395,6 @@ Outputs:
   LambdaFunctionArn:
     Description: "Lambda Function ARN"
     Value: !GetAtt LambdaFunction.Arn
+  AuthorizerLambdaFunctionArn:
+    Description: "Authorizer Lambda Function ARN"
+    Value: !GetAtt AuthorizerLambdaFunction.Arn

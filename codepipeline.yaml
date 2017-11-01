@@ -83,11 +83,6 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: Slack Token for Slash Command
-  SlackLegacyToken:
-    Type: String
-    NoEcho: true
-    Default: ""
-    Description: Slack Legacy Token for SDK
   ReadCapacityUnit:
     Description: Read Capacity Unit for DynamoDB Tables
     Type: Number
@@ -349,9 +344,6 @@ Resources:
                       - '", '
                       - '"SlackSlashCommandToken": "'
                       - !Ref SlackSlashCommandToken
-                      - '", '
-                      - '"SlackLegacyToken": "'
-                      - !Ref SlackLegacyToken
                       - '", '
                       - '"ReadCapacityUnit": "'
                       - !Ref ReadCapacityUnit

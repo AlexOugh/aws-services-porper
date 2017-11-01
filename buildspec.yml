@@ -3,10 +3,11 @@ phases:
   install:
     commands:
       - pip install --upgrade --user awscli
-      - pip install shyaml
       - cd src; pip install porper -t .; cd ..
   build:
     commands:
+      - sed -i "s/AWS::REGION/$AWS_DEFAULT_REGION/g" swagger.yaml
+      - sed -i "s/AWS::ACCOUNT_ID/$AWS_ACCOUNT_ID/g" swagger.yaml
       - aws cloudformation package
          --template-file template.yaml
          --s3-bucket $S3_BUCKET_NAME
