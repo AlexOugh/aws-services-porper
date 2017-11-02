@@ -63,6 +63,11 @@ Input Parameter Values
   (Only need the to do the first one. The second 2 steps are configured during this stack's creation)
 
 
+## Initialization
+
+After a stack is successfully created, please run 'init_dynamodb.py' to create default groups in 'group' table
+
+
 ## [![Sungard Availability Services | Labs][labs-logo]][labs-github-url]
 
 This project is maintained by the Labs group at [Sungard Availability
