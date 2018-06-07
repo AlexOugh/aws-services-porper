@@ -1,8 +1,8 @@
 
 source .env.local
 
-#cd src; pip install ../../porper-core/dist/porper-0.2.0-py2.py3-none-any.whl -t ./lib --upgrade; cd ..
-cd src; pip install porper -t ./lib; cd ..
+cd src; pip install ../../porper-core/dist/porper-0.4.0-py2.py3-none-any.whl -t ./lib --upgrade; cd ..
+#cd src; pip install porper -t ./lib; cd ..
 
 sed -i 1 "s/AWS::REGION/$AWS_DEFAULT_REGION/g" swagger.yaml
 sed -i 2 "s/AWS::ACCOUNT_ID/$AWS_ACCOUNT_ID/g" swagger.yaml
@@ -16,10 +16,6 @@ aws cloudformation package \
 
 mv swagger.yaml1 swagger.yaml
 rm swagger.yaml2
-
-
-#chmod a+x s3.sh
-#./s3.sh
 
 
 aws cloudformation deploy --template-file ./samTemplate.yaml \

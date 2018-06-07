@@ -12,10 +12,6 @@ phases:
          --template-file template.yaml
          --s3-bucket $S3_BUCKET_NAME
          --output-template-file samTemplate.yaml
-  post_build:
-    commands:
-      - chmod a+x s3.sh
-      - ./s3.sh
 artifacts:
   type: zip
   files:

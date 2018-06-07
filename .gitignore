@@ -6,3 +6,4 @@ samTemplate.yaml
 lib
 !lib/setup.cfg
 tests
+json
