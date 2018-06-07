@@ -1,4 +1,7 @@
 
+import sys
+sys.path.append('./lib')
+
 from porper.models.resource import Resource
 
 class AwsAccount(Resource):
