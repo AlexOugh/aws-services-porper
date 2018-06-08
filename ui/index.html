@@ -1,0 +1,206 @@
+<html lang="en">
+  <head>
+    <title>OpenIO Connect Authentication</title>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <!-- build:css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div className="containter" style="margin-left:50px;margin-top:50px">
+      <h3 className="text-left">Please Log In using your preference.</h3>
+      <p/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>Google Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="google_client_id" aria-describedby="basic-addon1">
+        </div>
+        <!--<div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client Secret" id="google_client_secret" aria-describedby="basic-addon1">
+        </div>-->
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Authorized redirect URI" id="google_redirect_url" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onGoogleSignIn()" value="Authenticate"/>
+        </div>
+        <div>
+          <label id="google_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>GitHub Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="github_client_id" aria-describedby="basic-addon1">
+        </div>
+        <!--<div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client Secret" id="github_client_secret" aria-describedby="basic-addon1">
+        </div>-->
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Authorization callback URL" id="github_redirect_url" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onGithubSignIn()" value="Authenticate"/>
+        </div>
+        <div>
+          <label id="github_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>Slack Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="slack_client_id" aria-describedby="basic-addon1">
+        </div>
+        <!--<div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client Secret" id="slack_client_secret" aria-describedby="basic-addon1">
+        </div>-->
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Redirect URL" id="slack_redirect_url" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onSlackSignIn()" value="Authenticate"/>&nbsp;<label id="slack_result"></label>
+        </div>
+        <div>
+          <label id="slack_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>SungardAS SSO Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="SSO Host" id="sungardas_sso_host" aria-describedby="basic-addon1" value="qa-sungard.sso.sungardas.io">
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="sungardas_client_id" aria-describedby="basic-addon1">
+        </div>
+        <!--<div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client Secret" id="sungardas_client_secret" aria-describedby="basic-addon1">
+        </div>-->
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Redirect URL" id="sungardas_redirect_url" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onSungardASSignIn()" value="Authenticate"/>&nbsp;<label id="sungardas_result"></label>
+        </div>
+        <div>
+          <label id="sungardas_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+    </div>
+
+    <script>
+
+      $.urlParam = function (name) {
+          var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.search);
+          return (results !== null) ? results[1] || 0 : false;
+      }
+
+      function get_redirect_url(provider) {
+        if (!localStorage[provider + '_redirect_url']) {
+          localStorage[provider + '_redirect_url'] = window.location.href.split('?')[0].replace(/\/$/, "");
+        }
+        return localStorage[provider + '_redirect_url'];
+      }
+
+      $(document).ready(function() {
+        //alert( "ready!" );
+        $("#google_redirect_url").val(get_redirect_url('google'));
+        $("#github_redirect_url").val(get_redirect_url('github'));
+        $("#slack_redirect_url").val(get_redirect_url('slack'));
+        $("#sungardas_redirect_url").val(get_redirect_url('sungardas'));
+
+        $("#google_client_id").val(localStorage['google_client_id']);
+        $("#github_client_id").val(localStorage['github_client_id']);
+        $("#slack_client_id").val(localStorage['slack_client_id']);
+        $("#sungardas_client_id").val(localStorage['sungardas_client_id']);
+
+        code = $.urlParam('code');
+        state = $.urlParam('state');
+        if (code) {
+          //alert(localStorage['identity'] + " code: " + code + ", state: " + state);
+          $("#" + localStorage['identity'] + "_result").html("code: " + code + ", state: " + state);
+        }
+      });
+
+      function clear_result() {
+        $("#google_result").html("");
+        $("#github_result").html("");
+        $("#slack_result").html("");
+        $("#sungardas_result").html("");
+      }
+
+      function random_str() {
+        return Math.random().toString(36).substring(7);
+      }
+
+      function onGoogleSignIn() {
+        //alert('google');
+        clear_result();
+        localStorage['identity'] = 'google';
+        var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + $("#google_client_id").val() + "&response_type=code&scope=openid%20profile&redirect_uri=" + $("#google_redirect_url").val();
+        //alert(url);
+        window.location = url;
+      };
+
+      function onGithubSignIn() {
+        //alert('github');
+        clear_result();
+        localStorage['identity'] = 'github';
+        var url = "https://github.com/login/oauth/authorize?scope=user&client_id=" + $("#github_client_id").val() + "&redirect_uri=" + $("#github_redirect_url").val() + "&state=" + random_str();
+        //alert(url);
+        window.location = url;
+      };
+
+      function onSlackSignIn() {
+        //alert('slack');
+        clear_result();
+        localStorage['identity'] = 'slack';
+        var url = "https://slack.com/oauth/authorize?scope=users.profile:read&client_id=" + $("#slack_client_id").val() + "&redirect_uri=" + $("#slack_redirect_url").val() + "&state=" + random_str();
+        //alert(url);
+        window.location = url;
+      };
+
+      function onSungardASSignIn() {
+        //alert('sungardas');
+        clear_result();
+        localStorage['identity'] = 'sungardas';
+        var url = "https://" + $("#sungardas_sso_host").val() + "/service/oauth2/authorize?realm=SungardAS&scope=openid+profile+email+address+phone+cloud&response_type=code&client_id=" + $("#sungardas_client_id").val() + "&redirect_uri=" + $("#sungardas_redirect_url").val();
+        alert(url);
+        window.location = url;
+      };
+
+      $('[id*="_client_id"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      $('[id*="_redirect_url"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      /*function onGoogleSignIn(googleUser) {
+        // Useful data for your client-side scripts:
+        var profile = googleUser.getBasicProfile();
+        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+        console.log('Full Name: ' + profile.getName());
+        console.log('Given Name: ' + profile.getGivenName());
+        console.log('Family Name: ' + profile.getFamilyName());
+        console.log("Image URL: " + profile.getImageUrl());
+        console.log("Email: " + profile.getEmail());
+
+        // The ID token you need to pass to your backend:
+        var id_token = googleUser.getAuthResponse().id_token;
+        console.log("ID Token: " + id_token);
+        alert(id_token);
+      };*/
+    </script>
+  </body>
+</html>
