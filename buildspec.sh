@@ -21,16 +21,17 @@ rm swagger.yaml2
 aws cloudformation deploy --template-file ./samTemplate.yaml \
   --capabilities CAPABILITY_IAM \
   --stack-name SungardAS-aws-services-porper \
-  --parameter-overrides GoogleTokeninfoEndpoint=$GOOGLE_TOKEN_INFO_ENDPOINT \
+  --parameter-overrides RedirectUri=$REDIRECT_URI \
+    GoogleTokeninfoEndpoint=$GOOGLE_TOKEN_INFO_ENDPOINT \
+    GoogleClientId=$GOOGLE_CLIENT_ID \
+    GoogleClientSecret=$GOOGLE_CLIENT_SECRET \
     SsoHost=$SSO_HOST \
-    SsoUser=$SSO_USER \
-    SsoPassword=$SSO_PASSWORD \
-    SsoRedirectUri=$SSO_REDIRECT_URI \
+    SsoClientId=$SSO_CLIENT_ID \
+    SsoClientSecret=$SSO_CLIENT_SECRET \
     GithubAuthEndpoint=$GITHUB_AUTH_ENDPOINT \
     GithubApiEndpoint=$GITHUB_API_ENDPOINT \
     GithubClientId=$GITHUB_CLIENT_ID \
     GithubClientSecret=$GITHUB_CLIENT_SECRET \
-    GithubRedirectUri=$GITHUB_REDIRECT_URI \
     SlackAuthEndpoint=$SLACK_AUTH_ENDPOINT \
     SlackApiEndpoint=$SLACK_API_ENDPOINT \
     SlackClientId=$SLACK_CLIENT_ID \
