@@ -11,15 +11,19 @@
       <p/>
 
       <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Redirect URL" id="redirect_url" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Porper API Server" id="porper_url" aria-describedby="basic-addon1">
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
         <label for="basic-url"><H5>Google Authentication</H5></label>
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Client ID" id="google_client_id" aria-describedby="basic-addon1">
-        </div>
-        <!--<div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Client Secret" id="google_client_secret" aria-describedby="basic-addon1">
-        </div>-->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Authorized redirect URI" id="google_redirect_url" aria-describedby="basic-addon1">
         </div>
         <div>
           <input type="button" class="btn btn-primary" onClick="onGoogleSignIn()" value="Authenticate"/>
@@ -35,12 +39,6 @@
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Client ID" id="github_client_id" aria-describedby="basic-addon1">
         </div>
-        <!--<div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Client Secret" id="github_client_secret" aria-describedby="basic-addon1">
-        </div>-->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Authorization callback URL" id="github_redirect_url" aria-describedby="basic-addon1">
-        </div>
         <div>
           <input type="button" class="btn btn-primary" onClick="onGithubSignIn()" value="Authenticate"/>
         </div>
@@ -55,12 +53,6 @@
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Client ID" id="slack_client_id" aria-describedby="basic-addon1">
         </div>
-        <!--<div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Client Secret" id="slack_client_secret" aria-describedby="basic-addon1">
-        </div>-->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Redirect URL" id="slack_redirect_url" aria-describedby="basic-addon1">
-        </div>
         <div>
           <input type="button" class="btn btn-primary" onClick="onSlackSignIn()" value="Authenticate"/>&nbsp;<label id="slack_result"></label>
         </div>
@@ -71,24 +63,18 @@
       <br/>
 
       <div style="margin-left:70px;margin-top:20px;margin-right:100px">
-        <label for="basic-url"><H5>SungardAS SSO Authentication</H5></label>
+        <label for="basic-url"><H5>SSO Authentication</H5></label>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="SSO Host" id="sungardas_sso_host" aria-describedby="basic-addon1" value="qa-sungard.sso.sungardas.io">
+          <input type="text" class="form-control" placeholder="SSO Host" id="sso_host" aria-describedby="basic-addon1">
         </div>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Client ID" id="sungardas_client_id" aria-describedby="basic-addon1">
-        </div>
-        <!--<div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Client Secret" id="sungardas_client_secret" aria-describedby="basic-addon1">
-        </div>-->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Redirect URL" id="sungardas_redirect_url" aria-describedby="basic-addon1">
+          <input type="text" class="form-control" placeholder="Client ID" id="sso_client_id" aria-describedby="basic-addon1">
         </div>
         <div>
-          <input type="button" class="btn btn-primary" onClick="onSungardASSignIn()" value="Authenticate"/>&nbsp;<label id="sungardas_result"></label>
+          <input type="button" class="btn btn-primary" onClick="onSSOSignIn()" value="Authenticate"/>&nbsp;<label id="sso_result"></label>
         </div>
         <div>
-          <label id="sungardas_result" style="margin-top:20px"></label>
+          <label id="sso_result" style="margin-top:20px"></label>
         </div>
       </div>
       <br/>
@@ -102,24 +88,24 @@
           return (results !== null) ? results[1] || 0 : false;
       }
 
-      function get_redirect_url(provider) {
-        if (!localStorage[provider + '_redirect_url']) {
-          localStorage[provider + '_redirect_url'] = window.location.href.split('?')[0].replace(/\/$/, "");
+      function get_redirect_url() {
+        if (!localStorage['redirect_url']) {
+          localStorage['redirect_url'] = window.location.href.split('?')[0].replace(/\/$/, "");
         }
-        return localStorage[provider + '_redirect_url'];
+        return localStorage['redirect_url'];
       }
 
       $(document).ready(function() {
         //alert( "ready!" );
-        $("#google_redirect_url").val(get_redirect_url('google'));
-        $("#github_redirect_url").val(get_redirect_url('github'));
-        $("#slack_redirect_url").val(get_redirect_url('slack'));
-        $("#sungardas_redirect_url").val(get_redirect_url('sungardas'));
+        var redirect_uri = get_redirect_url();
+        $("#redirect_url").val(redirect_uri);
+
+        $("#sso_host").val(localStorage['sso_host']);
 
         $("#google_client_id").val(localStorage['google_client_id']);
         $("#github_client_id").val(localStorage['github_client_id']);
         $("#slack_client_id").val(localStorage['slack_client_id']);
-        $("#sungardas_client_id").val(localStorage['sungardas_client_id']);
+        $("#sso_client_id").val(localStorage['sso_client_id']);
 
         code = $.urlParam('code');
         state = $.urlParam('state');
@@ -133,7 +119,7 @@
         $("#google_result").html("");
         $("#github_result").html("");
         $("#slack_result").html("");
-        $("#sungardas_result").html("");
+        $("#sso_result").html("");
       }
 
       function random_str() {
@@ -144,7 +130,7 @@
         //alert('google');
         clear_result();
         localStorage['identity'] = 'google';
-        var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + $("#google_client_id").val() + "&response_type=code&scope=openid%20profile&redirect_uri=" + $("#google_redirect_url").val();
+        var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + $("#google_client_id").val() + "&response_type=code&scope=openid%20profile&redirect_uri=" + $("#redirect_url").val();
         //alert(url);
         window.location = url;
       };
@@ -153,7 +139,7 @@
         //alert('github');
         clear_result();
         localStorage['identity'] = 'github';
-        var url = "https://github.com/login/oauth/authorize?scope=user&client_id=" + $("#github_client_id").val() + "&redirect_uri=" + $("#github_redirect_url").val() + "&state=" + random_str();
+        var url = "https://github.com/login/oauth/authorize?scope=user&client_id=" + $("#github_client_id").val() + "&redirect_uri=" + $("#redirect_url").val() + "&state=" + random_str();
         //alert(url);
         window.location = url;
       };
@@ -162,17 +148,18 @@
         //alert('slack');
         clear_result();
         localStorage['identity'] = 'slack';
-        var url = "https://slack.com/oauth/authorize?scope=users.profile:read&client_id=" + $("#slack_client_id").val() + "&redirect_uri=" + $("#slack_redirect_url").val() + "&state=" + random_str();
+        var url = "https://slack.com/oauth/authorize?scope=users.profile:read&client_id=" + $("#slack_client_id").val() + "&redirect_uri=" + $("#redirect_url").val() + "&state=" + random_str();
         //alert(url);
         window.location = url;
       };
 
-      function onSungardASSignIn() {
-        //alert('sungardas');
+      function onSSOSignIn() {
+        //alert('sso');
         clear_result();
-        localStorage['identity'] = 'sungardas';
-        var url = "https://" + $("#sungardas_sso_host").val() + "/service/oauth2/authorize?realm=SungardAS&scope=openid+profile+email+address+phone+cloud&response_type=code&client_id=" + $("#sungardas_client_id").val() + "&redirect_uri=" + $("#sungardas_redirect_url").val();
-        alert(url);
+        localStorage['identity'] = 'sso';
+        var url = "https://" + $("#sso_host").val() + "/service/oauth2/authorize?realm=SungardAS&scope=openid+profile+email+address+phone+cloud&response_type=code&client_id=" + $("#sso_client_id").val() + "&redirect_uri=" + $("#redirect_url").val();
+        //var url = $("#sso_auth_url").val() + "&client_id=" + $("#sso_client_id").val() + "&redirect_uri=" + $("#redirect_url").val();
+        //alert(url);
         window.location = url;
       };
 
@@ -181,7 +168,12 @@
         localStorage[$(this).attr('id')] = $(this).val();
       });
 
-      $('[id*="_redirect_url"]').change(function() {
+      $('[id*="redirect_url"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      $('[id="sso_host"]').change(function() {
         //alert($(this).attr('id') + " = " + $(this).val());
         localStorage[$(this).attr('id')] = $(this).val();
       });
