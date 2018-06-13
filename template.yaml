@@ -301,6 +301,13 @@ Resources:
           SLACK_REDIRECT_URI: !Ref RedirectUri
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
+          GROUP_TABLE_NAME: !Ref GroupTable
+          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
+          PERMISSION_TABLE_NAME: !Ref PermissionTable
+          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
+          USER_TABLE_NAME: !Ref UserTable
+          AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
       Events:
         ProxyApiGreedy:
           Type: Api
