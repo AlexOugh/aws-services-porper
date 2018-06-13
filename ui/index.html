@@ -97,8 +97,9 @@
 
       $(document).ready(function() {
         //alert( "ready!" );
-        var redirect_uri = get_redirect_url();
-        $("#redirect_url").val(redirect_uri);
+        var redirect_url = get_redirect_url();
+        $("#redirect_url").val(redirect_url);
+        $("#porper_url").val(localStorage['porper_url']);
 
         $("#sso_host").val(localStorage['sso_host']);
 
@@ -112,6 +113,7 @@
         if (code) {
           //alert(localStorage['identity'] + " code: " + code + ", state: " + state);
           $("#" + localStorage['identity'] + "_result").html("code: " + code + ", state: " + state);
+          authenticate(code, state);
         }
       });
 
@@ -148,7 +150,7 @@
         //alert('slack');
         clear_result();
         localStorage['identity'] = 'slack';
-        var url = "https://slack.com/oauth/authorize?scope=users.profile:read&client_id=" + $("#slack_client_id").val() + "&redirect_uri=" + $("#redirect_url").val() + "&state=" + random_str();
+        var url = "https://slack.com/oauth/authorize?scope=identity.basic,identity.email&client_id=" + $("#slack_client_id").val() + "&redirect_uri=" + $("#redirect_url").val() + "&state=" + random_str();
         //alert(url);
         window.location = url;
       };
@@ -163,7 +165,7 @@
         window.location = url;
       };
 
-      $('[id*="_client_id"]').change(function() {
+      $('[id="porper_url"]').change(function() {
         //alert($(this).attr('id') + " = " + $(this).val());
         localStorage[$(this).attr('id')] = $(this).val();
       });
@@ -173,26 +175,89 @@
         localStorage[$(this).attr('id')] = $(this).val();
       });
 
+      $('[id*="_client_id"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
       $('[id="sso_host"]').change(function() {
         //alert($(this).attr('id') + " = " + $(this).val());
         localStorage[$(this).attr('id')] = $(this).val();
       });
 
-      /*function onGoogleSignIn(googleUser) {
-        // Useful data for your client-side scripts:
-        var profile = googleUser.getBasicProfile();
-        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-        console.log('Full Name: ' + profile.getName());
-        console.log('Given Name: ' + profile.getGivenName());
-        console.log('Family Name: ' + profile.getFamilyName());
-        console.log("Image URL: " + profile.getImageUrl());
-        console.log("Email: " + profile.getEmail());
+      function authenticate(code, state) {
 
-        // The ID token you need to pass to your backend:
-        var id_token = googleUser.getAuthResponse().id_token;
-        console.log("ID Token: " + id_token);
-        alert(id_token);
-      };*/
+        var porper_url = localStorage['porper_url'];
+        var provider = localStorage['identity'];
+        var url = porper_url + "/" + provider + "_auth";
+        var params = {
+          "oper": "authenticate",
+          "code": code,
+          "state": state
+        }
+        if (provider == 'github') {
+        }
+        else if (provider == 'google') {
+        }
+        else if (provider == 'slack') {
+        }
+        else if (provider == 'sso') {
+          params['redirect_uri'] = $("#redirect_url").val();
+        }
+
+        const method = 'POST';
+        send_request(url, method, params).then(function(user) {
+          alert(JSON.stringify(user));
+        })
+        .catch(function(err) {
+          alert(err);
+        });
+      }
+
+      function send_request(url, method, data) {
+        if (data) {
+          data = JSON.stringify(data);
+        }
+        return new Promise(function (resolve, reject) {
+          var request = new XMLHttpRequest();
+          request.open(method || 'GET', url);
+          request.setRequestHeader('Content-Type', 'application/json');
+          /*const access_token = sessionStorage.getItem('access_token');
+          if (access_token) {
+            request.setRequestHeader('Authorization', access_token);
+          }
+          else {
+            if (!anonymous) {
+              //sessionStorage.setItem('last_url', window.location);
+              browserHistory.push('/');
+              return;
+            }
+          }*/
+          request.onload = function () {
+            if (request.status >= 200 && request.status < 300) {
+               var data = 'response' in request ? request.response : request.responseText;
+              try {
+                resolve(JSON.parse(data));
+              } catch (e) {
+                console.error(e);
+                reject(e);
+              }
+            } else {
+              reject(request.response);
+            }
+          };
+          request.onerror = function () {
+            alert(request.status);
+            reject(request.status);
+          };
+          if (data) {
+            request.send(data);
+          } else {
+            request.send();
+          }
+        });
+      }
+
     </script>
   </body>
 </html>
