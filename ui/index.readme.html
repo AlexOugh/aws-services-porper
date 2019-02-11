@@ -1,0 +1,121 @@
+<html lang="en">
+  <head>
+    <title>How To Prepare OpenID Connect Authentication</title>
+
+    <!-- build:css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+  </head>
+  <body>
+
+    <div class="container" style="margin-left:50px;margin-top:50px">
+
+      <H1>For GitHub Authentication</H1>
+      <p/>
+
+      <H3>Create OAuth Application</H3>
+      <ul>
+        <li>Follow the direction <a href="https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/">here</a> to create an OAuth application
+          <pre style=display:block;white-space;margin-top:10px>Use this site url for <b>Authorization callback URL</b></pre>
+        </li>
+        <li>Once completed, you will get <b>Clinet ID</b> and <b>Client Secret</b> that will be used in the next step.
+        </li>
+      </ul>
+      <p/>
+
+      <H3>Authenticate with a valid identity</H3>
+        <ul>
+          <li>Connect to Authentication url using a web browser
+            <pre style=display:block;white-space:pre-wrap;margin-top:10px>https://github.com/login/oauth/authorize?scope=user&client_id=<i>&lt;returned_client_id&gt;</i>&redirect_uri=<i>&lt;callback_url&gt;</i>&state=<i>&lt;any_unique_value&gt;</i></pre>
+          </li>
+          <li>You should be redirected to the 'callback_url' with 'code' & 'state' values
+            <pre style=display:block;white-space:pre-wrap;margin-top:10px><i>&lt;callback_url&gt;</i>/?code=<i><b>&lt;code_value_after_successful_login&gt;</b></i>&state=<i><b>&lt;prev_state_value&gt;</b></i></pre>
+          </li>
+        </ul>
+      <p/>
+
+      <H3>Inteface with Porper</H3>
+        <ul>
+          <li>Call Porper API interface with above 'code' & 'state' values after invited
+            <pre style=display:block;white-space;margin-top:10px></pre>
+          </li>
+        <ul>
+      <p/>
+
+    </div>
+
+
+    <div class="container" style="margin-left:50px;margin-top:50px">
+
+      <H1>For Google Authentication</H1>
+      <p/>
+
+      <H3>Create OAuth 2.0 Client ID</H3>
+      <ul>
+        <li>Follow the direction <a href="https://developers.google.com/identity/protocols/OpenIDConnect">here</a> to create an OAuth 2.0 Client ID
+          <pre style=display:block;white-space;margin-top:10px>Choose 'Web Application' for <b>Application Type</b></pre>
+          <pre style=display:block;white-space;margin-top:10px>Use this site url for <b>Authorized redirect URIs</b></pre>
+        </li>
+        <li>Once completed, you will get <b>Clinet ID</b> and <b>Client Secret</b> that will be used in the next step.
+        </li>
+      </ul>
+      <p/>
+
+      <H3>Authenticate with a valid identity</H3>
+      <ul>
+        <li>Connect to Authentication url using a web browser
+          <pre style=display:block;white-space:pre-wrap;margin-top:10px>https://accounts.google.com/o/oauth2/v2/auth?client_id=<i>&lt;returned_client_id&gt;</i>&response_type=code&scope=openid%20profile&redirect_uri=<i>&lt;redirect_uri&gt;</i></pre>
+        </li>
+        <li>You should be redirected to the 'redirect_uri' with 'code' value
+          <pre style=display:block;white-space:pre-wrap;margin-top:10px><i>&lt;callback_url&gt;</i>/?code=<i><b>&lt;code_value_after_successful_login&gt;</b></i>&authuser=0&session_state=<i>&lt;state&gt;</i>&prompt=consent#</i></pre>
+        </li>
+      </ul>
+      <p/>
+
+      <H3>Inteface with Porper</H3>
+        <ul>
+          <li>Call Porper API interface with above 'code' value after invited
+            <pre style=display:block;white-space;margin-top:10px></pre>
+          </li>
+        <ul>
+      <p/>
+
+    </div>
+
+    <div class="container" style="margin-left:50px;margin-top:50px">
+
+      <H1>For Slack Authentication</H1>
+
+      <H3>Create an Application</H3>
+      <ul>
+        <li>Follow the direction <a href="https://api.slack.com/docs/oauth">here</a> to create an application
+          <pre style=display:block;white-space;margin-top:10px>Use this site url for <b>Redirect URLs</b> in <b>OAuth & Permissions</b> side menu</pre>
+        </li>
+        <li>Once completed, you will get <b>Clinet ID</b> and <b>Client Secret</b> in <b>Basic Information</b> side menu that will be used in the next step.
+        </li>
+      </ul>
+      <p/>
+
+      <H3>Authenticate with a valid identity</H3>
+      <ul>
+        <li>Connect to Authentication url using a web browser
+          <pre style=display:block;white-space:pre-wrap;margin-top:10px>https://slack.com/oauth/authorize?scope=users.profile:read&client_id=<i>&lt;returned_client_id&gt;</i>&redirect_uri=<i>&lt;callback_url&gt;</i>&state=<i>&lt;any_unique_value&gt;</i></pre>
+          <div style="display:none">https://slack.com/oauth/authorize?scope=bot,users.profile:read,commands&client_id=</div>
+        </li>
+        <li>You should be redirected to the 'redirect_uri' with 'code' value
+          <pre style=display:block;white-space:pre-wrap;margin-top:10px><i>&lt;callback_url&gt;</i>/?code=<i><b>&lt;code_value_after_successful_login&gt;</b></i>state=<i><b>&lt;prev_state_value&gt;</b></i></pre>
+        </li>
+      </ul>
+      <p/>
+
+      <H3>Inteface with Porper</H3>
+        <ul>
+          <li>Call Porper API interface with above 'code' & 'state' values after invited
+            <pre style=display:block;white-space;margin-top:10px></pre>
+          </li>
+        <ul>
+      <p/>
+
+    </div>
+
+  </body>
+</html>

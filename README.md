@@ -25,11 +25,9 @@ Input Parameter Values
 
 - SsoHost:
 
-- SsoUser:
+- SsoClientId:
 
-- SsoPassword:
-
-- SsoRedirectUri:
+- SsoClientSecret:
 
 - GithubAuthEndpoint: Endpoint url to confirm GitHub tokens
 
