@@ -20,7 +20,7 @@ rm swagger.yaml2
 
 aws cloudformation deploy --template-file ./samTemplate.yaml \
   --capabilities CAPABILITY_IAM \
-  --stack-name SungardAS-aws-services-porper \
+  --stack-name SungardAS-aws-services-porper-afactor \
   --parameter-overrides RedirectUri=$REDIRECT_URI \
     GoogleTokeninfoEndpoint=$GOOGLE_TOKEN_INFO_ENDPOINT \
     GoogleClientId=$GOOGLE_CLIENT_ID \

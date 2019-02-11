@@ -1,0 +1,301 @@
+
+Create a stack using template.ui.yaml
+
+  - Stack Name: AFactor-Redirect-URL-Website
+  - Write down 'S3WebsiteBucket' and 'WebsiteURL' in the created stack's Outputs
+
+
+Reference "index.readme.html" for how to prepare OpenID Connect
+
+  For GitHub Authentication
+
+    - Create OAuth App
+      https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/
+
+        Name: AFactor
+
+        Client ID: 75f730addfdde81ca4aa
+        Client Secret: 45b934c8fe709b7e3de6749aa5038587a425905f
+        Authorization callback URL: http://afactor-redirect-url-website-s3bucket-1sqrakhon4swq.s3-website-us-east-1.amazonaws.com/
+
+    - Connect to this url using a web browser
+      $GITHUB_AUTH_ENDPOINT/authorize?scope=user&client_id=$GITHUB_CLIENT_ID&redirect_uri=$GITHUB_REDIRECT_URI&state=1234
+      https://github.com/login/oauth/authorize?scope=user&client_id=75f730addfdde81ca4aa&redirect_uri=http://sungardas-aws-services-porper-authentica-s3bucket-1vlf5jveyuuvo.s3-website-us-east-1.amazonaws.com&state=1234
+
+    - You should be redirected to the given 'redirect_uri' with return value of "code"
+      http://sungardas-aws-services-porper-authentica-s3bucket-1vlf5jveyuuvo.s3-website-us-east-1.amazonaws.com/?code=eaaae6bbc3ee671cafff&state=1234
+
+    - Use 'code' and 'state' values in returned url
+
+
+  For Google Authentication
+
+    - Create OAuth 2.0 Client ID
+      https://developers.google.com/identity/protocols/OpenIDConnect
+
+      OAuth consnet screen - Product name: SungardASPoC
+      Application Type: Web application
+      Name: AFactor
+      Authorized redirect URIs: <'WebsiteURL' in the created stack's Outputs>
+
+      Client ID: 614423716964-h4rtjvjumhg7tchfhc27a9hgue5otj2j.apps.googleusercontent.com
+      Client Secret: cN2dW58N-D6BgB7xuLsGOvYd
+
+    - Connect to this url using a web browser
+      https://accounts.google.com/o/oauth2/v2/auth?
+        client_id=614423716964-h4rtjvjumhg7tchfhc27a9hgue5otj2j.apps.googleusercontent.com&
+        response_type=code&
+        scope=openid%20profile&
+        redirect_uri=<'WebsiteURL' in the created stack's Outputs>
+
+    - You should be redirected to the given 'redirect_uri' with return value of "code"
+      http://sungardas-aws-services-porper-authentica-s3bucket-1vlf5jveyuuvo.s3-website-us-east-1.amazonaws.com/?code=4/AACCpnEKw58sbmbthzLtJjdejNoHmw2CrVXlMiwK4p71cMNcwIb86FX6zIzQpyQwnkSB4arltqTeXdUL4_RkFvM&authuser=0&session_state=4da0d79189eef9d460fd5f187fd5b7b13575da92..e5aa&prompt=consent#
+
+    - To get id_token from the returned 'code'
+      POST https://www.googleapis.com/oauth2/v4/token
+      {
+        "code": "4/AACCpnEKw58sbmbthzLtJjdejNoHmw2CrVXlMiwK4p71cMNcwIb86FX6zIzQpyQwnkSB4arltqTeXdUL4_RkFvM",
+        "client_id": "614423716964-h4rtjvjumhg7tchfhc27a9hgue5otj2j.apps.googleusercontent.com",
+        "client_secret": "cN2dW58N-D6BgB7xuLsGOvYd",
+        "redirect_uri": "<'WebsiteURL' in the created stack's Outputs>",
+        "grant_type": "authorization_code"
+      }
+
+      {
+        "error": "unsupported_grant_type",
+        "error_description": "Invalid grant_type: "
+      }
+
+
+  For Slack Authentication
+
+    https://api.slack.com/apps
+
+    "Create New App" button
+
+      Application name: AFactor
+
+        "OAuth & Permissions" side menu
+          - Redirect URLS: <'WebsiteURL' in the created stack's Outputs>
+          - Scopes: 'identity.basic' & 'identity.email'
+
+
+    Client ID: 17228684455.378532001109
+    Client Secret: 2f7c57740728ce0c3e6099f5d75b69a0
+    Verification Token: AlgHso8h1TUYTHLFwjS39nZh
+    Redirect URLS: http://afactor-redirect-url-website-s3bucket-1sqrakhon4swq.s3-website-us-east-1.amazonaws.com/
+
+
+
+  For SSO Authentication
+
+    Production
+
+      //SSO Server Auth URL: https://sso.sungardas.com/service/oauth2/authorize?realm=SungardAS&scope=openid+profile+email+address+phone+cloud&response_type=code&client_id=
+      Host: sso.sungardas.com
+      Client ID: MsAwsSungard
+      Client Secret: YcdNkt_6y
+
+    Dev
+
+      //SSO Server Auth URL: https://qa-sungard.sso.sungardas.io/service/oauth2/authorize?realm=SungardAS&scope=openid+profile+email+address+phone+cloud&response_type=code
+      Host: qa-sungard.sso.sungardas.io
+      Client ID: msaws
+      Client Secret: Sungard01
+
+
+
+
+Deploy the main stack, aws-services-porper
+
+
+
+Initialization after stack creation
+
+  - In DynamoDB table
+
+    - Find the 'group' table name
+    $ export GROUP_TABLE_NAME=SungardAS-aws-services-porper-GroupTable-OMAGFD3AK385
+    $ echo '{}' | sam local invoke InitializerLambdaFunction
+
+    Or
+
+    - Run 'SungardAS-Porper-Initializer' in the Lambda Console
+
+
+
+Copy ui/index.html in the S3 Website Bucket and make it public
+
+
+Connect to S3 Website Url using a web browser
+
+  Authenticate a user against one of the Identify Providers to register it as an admin in Porper
+
+  - Choose any Provider authentication
+
+    - Enter its 'Client ID' value
+    - Press 'Authenticate' button
+
+  - GitHub Authentication
+
+    Path:  "/github_auth"
+    Method: POST
+    Params: {
+      "oper": "authenticate",
+      "code": <code>,
+      "state": <state>
+    }
+
+    Get "access_token" from the result
+      {
+        "access_token": "b318bf80dc0628a2df367194e4b7150750fd86ee",
+        .....
+      }
+
+
+
+How to create a group
+
+  Path:  "/group"
+  Method: POST
+  Header: "Authorization: <returned_access_token>"
+  Params: {
+    "name": <group_name>
+  }
+
+  Get "id" from the result
+    {
+      "name": "the first group",
+      "id": "54e5953b-5f7d-43c6-8ef5-cf4811979c9b"
+    }
+
+
+
+How to create groups in bulk
+
+
+
+
+
+How to invite a new user
+
+  Path: "/invited_user"
+  Method: POST
+  Header: "Authorization: <returned_access_token>"
+  Params
+  {
+    "email": "<user_email_address>",
+    "group_id": "<group_id>",
+    "is_admin": 0 | 1 as digit,
+    "auth_type": "google | github | slack | sso"
+  }
+
+
+  * Case when inviting the admin user?
+
+
+How to invite users in bulk
+
+
+
+
+How to authentication
+
+
+
+
+
+
+AuthController():
+
+    def authenticate(self, params):
+        user_id = params['user_id']
+        email = params.get('email')
+        family_name = params.get('family_name')
+        given_name = params.get('given_name')
+        name = params.get('name')
+        auth_type = params['auth_type']
+        access_token = params['access_token']
+        refresh_token = params['refresh_token']
+
+    def find_groups(self, user_id):
+
+
+GithubAuthController(AuthController):
+
+    def authenticate(self, params):
+        code = params['code']
+        state = params['state']
+        #redirect_uri = params['redirect_uri']
+
+
+GoogleAuthController(AuthController):
+
+    def authenticate(self, params):
+        id_token = params['id_token']
+
+
+GroupController:
+
+    # only the admin can create a group
+    def create(self, access_token, params):
+        user_id = self.token_controller.find_user_id(access_token)
+        return self.create_using_user_id(user_id, params)
+
+    def create_using_user_id(self, user_id, params):
+        if not self.permission_controller.is_admin(user_id):  raise Exception("not permitted")
+        return self.group.create(params)
+
+    def update(self, access_token, params):
+        raise Exception("not supported")
+
+    def delete(self, access_token, params):
+        raise Exception("not supported")
+
+    """
+    1. return requested groups if I'm the admin
+    2. if 'user_id' is given,
+        - return all groups where both this user and given user belong
+    3. otherwise, return all groups where this user belongs
+    """
+    def find(self, access_token, params):
+        user_id = self.token_controller.find_user_id(access_token)
+        return self.find_using_user_id(user_id, params)
+
+    def find_using_user_id(self, user_id, params):
+
+        # return all groups if I'm an admin
+        if self.permission_controller.is_admin(user_id):
+            if not params.get('user_id'):
+                return self.group.find(params)
+            else:
+                user_groups = self.user_group.find({'user_id': params['user_id']})
+                if len(user_groups) == 0:   return []
+                group_ids = [ user_group['group_id'] for user_group in user_groups ]
+                params['ids'] = group_ids
+                del params['user_id']
+                return self.group.find(params)
+
+        # find all groups where this user belongs
+        my_user_groups = self.user_group.find({'user_id': user_id})
+        if len(my_user_groups) == 0:   return []
+        my_group_ids = [ user_group['group_id'] for user_group in my_user_groups ]
+
+        if params.get('user_id'):
+            # now find all groups where the given user belongs
+            user_groups = self.user_group.find({'user_id': params['user_id']})
+            if len(user_groups) == 0:   return []
+            del params['user_id']
+            given_group_ids = [ user_group['group_id'] for user_group in user_groups ]
+            group_ids = []
+            # return all groups where both this user and given user belong
+            for id in given_group_ids:
+                if id in my_group_ids:
+                    group_ids.append(id)
+            if len(group_ids) == 0: return []
+        else:
+            # return all groups where this user belongs
+            group_ids = my_group_ids
+
+        params['ids'] = group_ids
+        return self.group.find(params)
