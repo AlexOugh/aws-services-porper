@@ -1,0 +1,263 @@
+<html lang="en">
+  <head>
+    <title>OpenIO Connect Authentication</title>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <!-- build:css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div className="containter" style="margin-left:50px;margin-top:50px">
+      <h3 className="text-left">Please Log In using your preference.</h3>
+      <p/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Redirect URL" id="redirect_url" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Porper API Server" id="porper_url" aria-describedby="basic-addon1">
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>Google Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="google_client_id" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onGoogleSignIn()" value="Authenticate"/>
+        </div>
+        <div>
+          <label id="google_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>GitHub Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="github_client_id" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onGithubSignIn()" value="Authenticate"/>
+        </div>
+        <div>
+          <label id="github_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>Slack Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="slack_client_id" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onSlackSignIn()" value="Authenticate"/>&nbsp;<label id="slack_result"></label>
+        </div>
+        <div>
+          <label id="slack_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+      <div style="margin-left:70px;margin-top:20px;margin-right:100px">
+        <label for="basic-url"><H5>SSO Authentication</H5></label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="SSO Host" id="sso_host" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Client ID" id="sso_client_id" aria-describedby="basic-addon1">
+        </div>
+        <div>
+          <input type="button" class="btn btn-primary" onClick="onSSOSignIn()" value="Authenticate"/>&nbsp;<label id="sso_result"></label>
+        </div>
+        <div>
+          <label id="sso_result" style="margin-top:20px"></label>
+        </div>
+      </div>
+      <br/>
+
+    </div>
+
+    <script>
+
+      $.urlParam = function (name) {
+          var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.search);
+          return (results !== null) ? results[1] || 0 : false;
+      }
+
+      function get_redirect_url() {
+        if (!localStorage['redirect_url']) {
+          localStorage['redirect_url'] = window.location.href.split('?')[0].replace(/\/$/, "");
+        }
+        return localStorage['redirect_url'];
+      }
+
+      $(document).ready(function() {
+        //alert( "ready!" );
+        var redirect_url = get_redirect_url();
+        $("#redirect_url").val(redirect_url);
+        $("#porper_url").val(localStorage['porper_url']);
+
+        $("#sso_host").val(localStorage['sso_host']);
+
+        $("#google_client_id").val(localStorage['google_client_id']);
+        $("#github_client_id").val(localStorage['github_client_id']);
+        $("#slack_client_id").val(localStorage['slack_client_id']);
+        $("#sso_client_id").val(localStorage['sso_client_id']);
+
+        code = $.urlParam('code');
+        state = $.urlParam('state');
+        if (code) {
+          //alert(localStorage['identity'] + " code: " + code + ", state: " + state);
+          $("#" + localStorage['identity'] + "_result").html("code: " + code + ", state: " + state);
+          authenticate(code, state);
+        }
+      });
+
+      function clear_result() {
+        $("#google_result").html("");
+        $("#github_result").html("");
+        $("#slack_result").html("");
+        $("#sso_result").html("");
+      }
+
+      function random_str() {
+        return Math.random().toString(36).substring(7);
+      }
+
+      function onGoogleSignIn() {
+        //alert('google');
+        clear_result();
+        localStorage['identity'] = 'google';
+        var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + $("#google_client_id").val() + "&response_type=code&scope=openid%20profile&redirect_uri=" + $("#redirect_url").val();
+        //alert(url);
+        window.location = url;
+      };
+
+      function onGithubSignIn() {
+        //alert('github');
+        clear_result();
+        localStorage['identity'] = 'github';
+        var url = "https://github.com/login/oauth/authorize?scope=user&client_id=" + $("#github_client_id").val() + "&redirect_uri=" + $("#redirect_url").val() + "&state=" + random_str();
+        //alert(url);
+        window.location = url;
+      };
+
+      function onSlackSignIn() {
+        //alert('slack');
+        clear_result();
+        localStorage['identity'] = 'slack';
+        var url = "https://slack.com/oauth/authorize?scope=identity.basic,identity.email&client_id=" + $("#slack_client_id").val() + "&redirect_uri=" + $("#redirect_url").val() + "&state=" + random_str();
+        //alert(url);
+        window.location = url;
+      };
+
+      function onSSOSignIn() {
+        //alert('sso');
+        clear_result();
+        localStorage['identity'] = 'sso';
+        var url = "https://" + $("#sso_host").val() + "/service/oauth2/authorize?realm=SungardAS&scope=openid+profile+email+address+phone+cloud&response_type=code&client_id=" + $("#sso_client_id").val() + "&redirect_uri=" + $("#redirect_url").val();
+        //var url = $("#sso_auth_url").val() + "&client_id=" + $("#sso_client_id").val() + "&redirect_uri=" + $("#redirect_url").val();
+        //alert(url);
+        window.location = url;
+      };
+
+      $('[id="porper_url"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      $('[id*="redirect_url"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      $('[id*="_client_id"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      $('[id="sso_host"]').change(function() {
+        //alert($(this).attr('id') + " = " + $(this).val());
+        localStorage[$(this).attr('id')] = $(this).val();
+      });
+
+      function authenticate(code, state) {
+
+        var porper_url = localStorage['porper_url'];
+        var provider = localStorage['identity'];
+        var url = porper_url + "/" + provider + "_auth";
+        var params = {
+          "oper": "authenticate",
+          "code": code,
+          "state": state
+        }
+        if (provider == 'github') {
+        }
+        else if (provider == 'google') {
+        }
+        else if (provider == 'slack') {
+        }
+        else if (provider == 'sso') {
+          params['redirect_uri'] = $("#redirect_url").val();
+        }
+
+        const method = 'POST';
+        send_request(url, method, params).then(function(user) {
+          alert(JSON.stringify(user));
+        })
+        .catch(function(err) {
+          alert(err);
+        });
+      }
+
+      function send_request(url, method, data) {
+        if (data) {
+          data = JSON.stringify(data);
+        }
+        return new Promise(function (resolve, reject) {
+          var request = new XMLHttpRequest();
+          request.open(method || 'GET', url);
+          request.setRequestHeader('Content-Type', 'application/json');
+          /*const access_token = sessionStorage.getItem('access_token');
+          if (access_token) {
+            request.setRequestHeader('Authorization', access_token);
+          }
+          else {
+            if (!anonymous) {
+              //sessionStorage.setItem('last_url', window.location);
+              browserHistory.push('/');
+              return;
+            }
+          }*/
+          request.onload = function () {
+            if (request.status >= 200 && request.status < 300) {
+               var data = 'response' in request ? request.response : request.responseText;
+              try {
+                resolve(JSON.parse(data));
+              } catch (e) {
+                console.error(e);
+                reject(e);
+              }
+            } else {
+              reject(request.response);
+            }
+          };
+          request.onerror = function () {
+            alert(request.status);
+            reject(request.status);
+          };
+          if (data) {
+            request.send(data);
+          } else {
+            request.send();
+          }
+        });
+      }
+
+    </script>
+  </body>
+</html>

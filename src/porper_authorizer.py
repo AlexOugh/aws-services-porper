@@ -5,6 +5,10 @@ import re
 import json
 import boto3
 #from base64 import b64decode
+
+import sys
+sys.path.append('./lib')
+
 from porper.controllers.token_controller import TokenController
 
 def lambda_handler(event, context):

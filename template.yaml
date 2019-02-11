@@ -1,27 +1,36 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: "AWS::Serverless-2016-10-31"
 Parameters:
+  RedirectUri:
+    Type: String
+    Default: ""
+    Description: Redirect Uri after Successful Authentication in Identiy Providers
   GoogleTokeninfoEndpoint:
     Type: String
     Default: "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token="
     Description: Endpoint url to confirm Google tokens
+  GoogleClientId:
+    Type: String
+    Default: ""
+    Description: Google Client Id
+  GoogleClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Google Client Secret
   SsoHost:
     Type: String
     Default: ""
     Description: SSO Host Name
-  SsoUser:
+  SsoClientId:
     Type: String
     Default: ""
-    Description: SSO User Name
-  SsoPassword:
+    Description: SSO Client Id
+  SsoClientSecret:
     Type: String
     Default: ""
     NoEcho: true
-    Description: SSO Password
-  SsoRedirectUri:
-    Type: String
-    Default: ""
-    Description: SSO Redirect Url
+    Description: SSO Client Secret
   GithubAuthEndpoint:
     Type: String
     Default: "https://github.com/login/oauth"
@@ -39,11 +48,6 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: GitHub Client Secret
-  GithubRedirectUri:
-    Type: String
-    NoEcho: true
-    Default: ""
-    Description: GitHub Redirect Uri
   SlackAuthEndpoint:
     Type: String
     Default: "https://slack.com/oauth"
@@ -78,7 +82,6 @@ Resources:
   UserTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "users"
       AttributeDefinitions:
         -
           AttributeName: "id"
@@ -93,7 +96,6 @@ Resources:
   GroupTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "groups"
       AttributeDefinitions:
         -
           AttributeName: "id"
@@ -108,7 +110,6 @@ Resources:
   AccessTokenTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "access_tokens"
       AttributeDefinitions:
         -
           AttributeName: "access_token"
@@ -123,7 +124,6 @@ Resources:
   PermissionTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "permissions"
       AttributeDefinitions:
         -
           AttributeName: "id"
@@ -138,7 +138,6 @@ Resources:
   InvitedUserTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "invited_users"
       AttributeDefinitions:
         -
           AttributeName: "email"
@@ -159,7 +158,6 @@ Resources:
   UserGroupTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "user_group_rels"
       AttributeDefinitions:
         -
           AttributeName: "user_id"
@@ -180,7 +178,6 @@ Resources:
   AWSAccountTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName : "aws_accounts"
       AttributeDefinitions:
         -
           AttributeName: "id"
@@ -284,22 +281,33 @@ Resources:
       Environment:
         Variables:
           GOOGLE_TOKENINFO_ENDPOINT: !Ref GoogleTokeninfoEndpoint
+          GOOGLE_CLIENT_ID: !Ref GoogleClientId
+          GOOGLE_CLIENT_SECRET: !Ref GoogleClientSecret
+          GOOGLE_REDIRECT_URI: !Ref RedirectUri
           SSO_HOST: !Ref SsoHost
-          SSO_USER: !Ref SsoUser
-          SSO_PASSWORD: !Ref SsoPassword
-          SSO_REDIRECT_URI: !Ref SsoRedirectUri
+          SSO_CLIENT_ID: !Ref SsoClientId
+          SSO_CLIENT_SECRET: !Ref SsoClientSecret
+          SSO_REDIRECT_URI: !Ref RedirectUri
           GITHUB_AUTH_ENDPOINT: !Ref GithubAuthEndpoint
           GITHUB_API_ENDPOINT: !Ref GithubApiEndpoint
           GITHUB_CLIENT_ID: !Ref GithubClientId
           GITHUB_CLIENT_SECRET: !Ref GithubClientSecret
-          GITHUB_REDIRECT_URI: !Ref GithubRedirectUri
+          GITHUB_REDIRECT_URI: !Ref RedirectUri
           SLACK_AUTH_ENDPOINT: !Ref SlackAuthEndpoint
           SLACK_API_ENDPOINT: !Ref SlackApiEndpoint
           SLACK_CLIENT_ID: !Ref SlackClientId
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
+          SLACK_REDIRECT_URI: !Ref RedirectUri
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
+          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
+          GROUP_TABLE_NAME: !Ref GroupTable
+          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
+          PERMISSION_TABLE_NAME: !Ref PermissionTable
+          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
+          USER_TABLE_NAME: !Ref UserTable
+          AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
       Events:
         ProxyApiGreedy:
           Type: Api
@@ -319,23 +327,33 @@ Resources:
       Environment:
         Variables:
           GOOGLE_TOKENINFO_ENDPOINT: !Ref GoogleTokeninfoEndpoint
+          GOOGLE_CLIENT_ID: !Ref GoogleClientId
+          GOOGLE_CLIENT_SECRET: !Ref GoogleClientSecret
+          GOOGLE_REDIRECT_URI: !Ref RedirectUri
           SSO_HOST: !Ref SsoHost
-          SSO_USER: !Ref SsoUser
-          SSO_PASSWORD: !Ref SsoPassword
-          SSO_REDIRECT_URI: !Ref SsoRedirectUri
+          SSO_CLIENT_ID: !Ref SsoClientId
+          SSO_CLIENT_SECRET: !Ref SsoClientSecret
+          SSO_REDIRECT_URI: !Ref RedirectUri
           GITHUB_AUTH_ENDPOINT: !Ref GithubAuthEndpoint
           GITHUB_API_ENDPOINT: !Ref GithubApiEndpoint
           GITHUB_CLIENT_ID: !Ref GithubClientId
           GITHUB_CLIENT_SECRET: !Ref GithubClientSecret
-          GITHUB_REDIRECT_URI: !Ref GithubRedirectUri
+          GITHUB_REDIRECT_URI: !Ref RedirectUri
           SLACK_AUTH_ENDPOINT: !Ref SlackAuthEndpoint
           SLACK_API_ENDPOINT: !Ref SlackApiEndpoint
           SLACK_CLIENT_ID: !Ref SlackClientId
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
+          SLACK_REDIRECT_URI: !Ref RedirectUri
           KMS_REGION: !Ref 'AWS::Region'
           KMS_KEY_ID: !Ref EncryptionDecryptionKey
-
+          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
+          GROUP_TABLE_NAME: !Ref GroupTable
+          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
+          PERMISSION_TABLE_NAME: !Ref PermissionTable
+          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
+          USER_TABLE_NAME: !Ref UserTable
+          AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
   AuthorizerLambdaFunctionIAMRole:
       Type: "AWS::IAM::Role"
       Properties:
@@ -378,7 +396,18 @@ Resources:
       CodeUri: ./src
       Role: !GetAtt AuthorizerLambdaFunctionIAMRole.Arn
       Timeout: 300
-
+  InitializerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SungardAS-Porper-Initializer
+      Handler: init_dynamodb.lambda_handler
+      Runtime: python2.7
+      CodeUri: ./src
+      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          GROUP_TABLE_NAME: !Ref GroupTable
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
@@ -398,3 +427,6 @@ Outputs:
   AuthorizerLambdaFunctionArn:
     Description: "Authorizer Lambda Function ARN"
     Value: !GetAtt AuthorizerLambdaFunction.Arn
+  InitializerLambdaFunctionArn:
+    Description: "Initializer Lambda Function ARN"
+    Value: !GetAtt InitializerLambdaFunction.Arn

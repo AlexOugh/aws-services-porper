@@ -18,27 +18,36 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Personal Access Token to Access GitHub Repository
+  RedirectUri:
+    Type: String
+    Default: ""
+    Description: Redirect Uri after Successful Authentication in Identiy Providers
   GoogleTokeninfoEndpoint:
     Type: String
     Default: "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token="
     Description: Endpoint url to confirm Google tokens
+  GoogleClientId:
+    Type: String
+    Default: ""
+    Description: Google Client Id
+  GoogleClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Google Client Secret
   SsoHost:
     Type: String
     Default: ""
     Description: SSO Host Name
-  SsoUser:
+  SsoClientId:
     Type: String
     Default: ""
     Description: SSO User Name
-  SsoPassword:
+  SsoClientSecret:
     Type: String
     Default: ""
     NoEcho: true
     Description: SSO Password
-  SsoRedirectUri:
-    Type: String
-    Default: ""
-    Description: SSO Redirect Url
   GithubAuthEndpoint:
     Type: String
     Default: "https://github.com/login/oauth"
@@ -56,11 +65,6 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: GitHub Client Secret
-  GithubRedirectUri:
-    Type: String
-    NoEcho: true
-    Default: ""
-    Description: GitHub Redirect Uri
   SlackAuthEndpoint:
     Type: String
     Default: "https://slack.com/oauth"
@@ -303,17 +307,23 @@ Resources:
                       - '"GoogleTokeninfoEndpoint": "'
                       - !Ref GoogleTokeninfoEndpoint
                       - '", '
+                      - '"GoogleClientId": "'
+                      - !Ref GoogleClientId
+                      - '", '
+                      - '"GoogleClientSecret": "'
+                      - !Ref GoogleClientSecret
+                      - '", '
+                      - '"RedirectUri": "'
+                      - !Ref RedirectUri
+                      - '", '
                       - '"SsoHost": "'
                       - !Ref SsoHost
                       - '", '
-                      - '"SsoUser": "'
-                      - !Ref SsoUser
+                      - '"SsoClientId": "'
+                      - !Ref SsoClientId
                       - '", '
-                      - '"SsoPassword": "'
-                      - !Ref SsoPassword
-                      - '", '
-                      - '"SsoRedirectUri": "'
-                      - !Ref SsoRedirectUri
+                      - '"SsoClientSecret": "'
+                      - !Ref SsoClientSecret
                       - '", '
                       - '"GithubAuthEndpoint": "'
                       - !Ref GithubAuthEndpoint
@@ -326,9 +336,6 @@ Resources:
                       - '", '
                       - '"GithubClientSecret": "'
                       - !Ref GithubClientSecret
-                      - '", '
-                      - '"GithubRedirectUri": "'
-                      - !Ref GithubRedirectUri
                       - '", '
                       - '"SlackAuthEndpoint": "'
                       - !Ref SlackAuthEndpoint

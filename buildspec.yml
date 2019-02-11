@@ -3,7 +3,7 @@ phases:
   install:
     commands:
       - pip install --upgrade --user awscli
-      - cd src; pip install porper -t .; cd ..
+      - cd src; pip install porper -t ./lib; cd ..
   build:
     commands:
       - sed -i "s/AWS::REGION/$AWS_DEFAULT_REGION/g" swagger.yaml
@@ -12,10 +12,6 @@ phases:
          --template-file template.yaml
          --s3-bucket $S3_BUCKET_NAME
          --output-template-file samTemplate.yaml
-  post_build:
-    commands:
-      - chmod a+x s3.sh
-      - ./s3.sh
 artifacts:
   type: zip
   files:

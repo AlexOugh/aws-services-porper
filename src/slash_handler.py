@@ -5,6 +5,9 @@ import urllib
 import shlex
 import traceback
 
+import sys
+sys.path.append('./lib')
+
 from porper.controllers.auth_controller import AuthController
 from porper.controllers.github_auth_controller import GithubAuthController
 from porper.controllers.google_auth_controller import GoogleAuthController
