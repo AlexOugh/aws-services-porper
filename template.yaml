@@ -78,6 +78,10 @@ Parameters:
     Description: Write Capacity Unit for DynamoDB Tables
     Type: Number
     Default: 5
+  PorperLambdaLayerARN:
+    Type: String
+    Description: Porper Lambda Layer ARN
+
 Resources:
   UserTable:
     Type: AWS::DynamoDB::Table
@@ -276,6 +280,8 @@ Resources:
       Handler: api_handler.lambda_handler
       Runtime: python2.7
       CodeUri: ./src
+      Layers:
+        - !Ref PorperLambdaLayerARN
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:
@@ -322,6 +328,8 @@ Resources:
       Handler: handler.lambda_handler
       Runtime: python2.7
       CodeUri: ./src
+      Layers:
+        - !Ref PorperLambdaLayerARN
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:
@@ -394,6 +402,8 @@ Resources:
       Handler: porper_authorizer.lambda_handler
       Runtime: python2.7
       CodeUri: ./src
+      Layers:
+        - !Ref PorperLambdaLayerARN
       Role: !GetAtt AuthorizerLambdaFunctionIAMRole.Arn
       Timeout: 300
   InitializerLambdaFunction:
@@ -403,6 +413,8 @@ Resources:
       Handler: init_dynamodb.lambda_handler
       Runtime: python2.7
       CodeUri: ./src
+      Layers:
+        - !Ref PorperLambdaLayerARN
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:

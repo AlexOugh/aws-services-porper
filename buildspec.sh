@@ -1,7 +1,7 @@
 
 source .env.local
 
-cd src; pip install ../../porper-core/dist/porper-0.4.0-py2.py3-none-any.whl -t ./lib --upgrade; cd ..
+#cd src; pip install ../../porper-core/dist/porper-0.4.0-py2.py3-none-any.whl -t ./lib --upgrade; cd ..
 #cd src; pip install porper -t ./lib; cd ..
 
 sed -i 1 "s/AWS::REGION/$AWS_DEFAULT_REGION/g" swagger.yaml
@@ -38,7 +38,8 @@ aws cloudformation deploy --template-file ./samTemplate.yaml \
     SlackClientSecret=$SLACK_CLIENT_SECRET \
     SlackSlashCommandToken=$SLACK_SLASH_COMMAND_TOKEN \
     ReadCapacityUnit=$READ_CAPACITY_UNIT \
-    WriteCapacityUnit=$WRITE_CAPACITY_UNIT
+    WriteCapacityUnit=$WRITE_CAPACITY_UNIT \
+    PorperLambdaLayerARN=$PORPER_LAMBDA_LAYER_ARN
 
 
 rm samTemplate.yaml
