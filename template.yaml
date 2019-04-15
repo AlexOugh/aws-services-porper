@@ -148,7 +148,6 @@ Resources:
   ProxyFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: SungardAS-Porper-Proxy
       Handler: api_handler.lambda_handler
       Runtime: python3.6
       CodeUri: ./src
@@ -188,7 +187,6 @@ Resources:
   LambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: SungardAS-Porper
       Handler: handler.lambda_handler
       Runtime: python3.6
       CodeUri: ./src
