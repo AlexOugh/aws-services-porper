@@ -150,7 +150,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Porper-Proxy
       Handler: api_handler.lambda_handler
-      Runtime: python2.7
+      Runtime: python3.6
       CodeUri: ./src
       Layers:
         - !Ref PorperLambdaLayerARN
@@ -190,7 +190,7 @@ Resources:
     Properties:
       FunctionName: SungardAS-Porper
       Handler: handler.lambda_handler
-      Runtime: python2.7
+      Runtime: python3.6
       CodeUri: ./src
       Layers:
         - !Ref PorperLambdaLayerARN

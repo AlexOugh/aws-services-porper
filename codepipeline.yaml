@@ -89,7 +89,7 @@ Parameters:
     Description: Slack Token for Slash Command
   ProjectImage:
     Type: String
-    Default: "aws/codebuild/python:2.7.12"
+    Default: "aws/codebuild/python:3.6.5-1.6.0"
     Description: Implemented Programming Language
   S3SharedBucketName:
     Type: String

@@ -1,9 +1,6 @@
 
 import json
 
-import sys
-sys.path.append('./lib')
-
 from porper.controllers.auth_controller import AuthController
 from porper.controllers.github_auth_controller import GithubAuthController
 from porper.controllers.google_auth_controller import GoogleAuthController
@@ -18,7 +15,7 @@ from aws_account_controller import AwsAccountController
 
 def lambda_handler(event, context):
 
-    print 'Received event:\n%s' % json.dumps(event)
+    print('Received event:\n{}'.format(json.dumps(event)))
 
     access_token = event.get('access_token')
     resource = event['resource']
@@ -35,5 +32,5 @@ def lambda_handler(event, context):
     else:
         if not access_token:    raise Exception("unauthorized")
         ret = getattr(controller, oper)(access_token, params)
-    print ret
+    print(ret)
     return ret

@@ -1,7 +1,4 @@
 
-import sys
-sys.path.append('./lib')
-
 from porper.controllers.resource_controller import ResourceController
 
 class AwsAccountController(ResourceController):

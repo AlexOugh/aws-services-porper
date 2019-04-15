@@ -5,9 +5,6 @@ import urllib
 import shlex
 import traceback
 
-import sys
-sys.path.append('./lib')
-
 from porper.controllers.auth_controller import AuthController
 from porper.controllers.github_auth_controller import GithubAuthController
 from porper.controllers.google_auth_controller import GoogleAuthController
@@ -34,17 +31,17 @@ slash_command_token = os.environ.get('SLACK_SLASH_COMMAND_TOKEN')
 
 def lambda_handler(event, context):
 
-    print 'Received event:\n%s' % json.dumps(event)
+    print('Received event:\n{}'.formatjson.dumps(event))
 
     try:
         body = event['body']
-        print 'Received body = %s' % body
+        print('Received body = {}'.format(body))
         params = {}
         param_strs = body.split('&')
         for str in param_strs:
             splitted = str.split('=')
             params[splitted[0]] = splitted[1]
-            print 'param %s = %s' % (splitted[0], splitted[1])
+            print('param %s = {}'.format(splitted[0], splitted[1]))
 
         if params.get('token') != slash_command_token:
             return _send_response("This request is not from Slack!!")
@@ -55,7 +52,7 @@ def lambda_handler(event, context):
             return globals()['%s' % (args[0])](params['user_id'], params['team_id'])
         else:
             return globals()['%s_%s' % (args[0], args[1])](params['user_id'], params['team_id'], *args[2:])
-    except Exception, ex:
+    except Exception as ex:
         traceback.print_exc()
         err_msg = '%s' % ex
         if err_msg == 'unauthorized' or err_msg == 'not permitted':
@@ -73,13 +70,13 @@ def _send_response(text, attachments=None):
     if attachments:
         response_body["attachments"] = attachments
     response['body'] = json.dumps(response_body)
-    print 'response = %s' % response
+    print('response = {}'.format(response))
     return response
 
 """def _find_user(user_id):
     sc = SlackClient(legacy_token)
     users = sc.api_call("users.list")["members"]
-    print '%s' % users
+    print('{}'.format(users))
     for user in users:
         if user_id == user["id"]:
             return user
@@ -93,7 +90,7 @@ def _find_invited(user_id, team_id):
     user_id = '%s-%s' % (team_id, user_id)
     invited_user_controller = InvitedUserController(dynamodb)
     items = invited_user_controller.find_using_user_id(user_id, {'email': user["profile"]["email"], 'auth_type': 'slack'})
-    print 'invited users : %s' % items
+    print('invited users : {}'.format(items))
     return items"""
 
 def _authenticate(user_id, team_id):
@@ -107,14 +104,14 @@ def _authenticate(user_id, team_id):
 
     group_controller = GroupController(dynamodb)
     items = group_controller.find_using_user_id(user_id, {})
-    print 'groups found : %s' % items
+    print('groups found : {}'.format(items))
     return items
 
 def activate(user_id, team_id):
 
     #invited_users = _find_invited(user_id, team_id)
     #if len(invited_users) == 0:
-    #    print 'no user found with %s-%s' % (team_id, user_id)
+    #    print('no user found with %s-{}'.format(team_id, user_id)
     #    return _send_response("You're not allowed. Please contact the Administrator")
 
     attachments = [ { "text": '%s/authorize?client_id=%s&scope=identity.basic,identity.email' % (auth_endpoint, client_id) } ]
@@ -122,16 +119,16 @@ def activate(user_id, team_id):
 
 def add_account(user_id, team_id, account_id, account_name, role_name, external_id):
 
-    print 'add_account'
-    print 'user_id = %s' % user_id
-    print 'team_id = %s' % team_id
-    print 'account_id = %s' % account_id
-    print 'account_name = %s' % account_name
-    print 'role_name = %s' % role_name
-    print 'external_id = %s' % external_id
+    print('add_account')
+    print('user_id = {}'.format(user_id))
+    print('team_id = {}'.format(team_id))
+    print('account_id = {}'.format(account_id))
+    print('account_name = {}'.format(account_name))
+    print('role_name = {}'.format(role_name))
+    print('external_id = {}'.format(external_id))
 
     if _authenticate(user_id, team_id) is None:
-        print 'no user found with %s-%s' % (team_id, user_id)
+        print('no user found with %s-{}'.format(team_id, user_id))
         return _send_response("You're not allowed. Please contact the Administrator")
 
     user_id = '%s-%s' % (team_id, user_id)
@@ -152,25 +149,25 @@ def invite_user(user_id, team_id, new_user_str, to=None, user_type=None):
     else:
         is_admin = False
         user_type = 'user'
-    print 'add_user'
-    print 'user_id = %s' % user_id
-    print 'team_id = %s' % team_id
-    print 'new_user_name = %s' % new_user_name
-    print 'new_user_id = %s' % new_user_id
-    print 'is_admin = %s' % is_admin
+    print('add_user')
+    print('user_id = {}'.format(user_id))
+    print('team_id = {}'.format(team_id))
+    print('new_user_name = {}'.format(new_user_name))
+    print('new_user_id = {}'.format(new_user_id))
+    print('is_admin = {}'.format(is_admin))
 
     #new_user = _find_user(new_user_id)
     #if not new_user:
-    #    print 'no slack user found with %s' % (new_user_id)
+    #    print('no slack user found with {}'.format(new_user_id))
     #    return _send_response("The specified user does not exist in Slack")
 
     groups = _authenticate(user_id, team_id)
     if groups is None:
-        print 'no user found with %s-%s' % (team_id, user_id)
+        print('no user found with {}-{}'.format(team_id, user_id))
         return _send_response("You're not allowed. Please contact the Administrator")
 
     if not groups:
-        print "something is not right because this user does not belong to any group"
+        print("something is not right because this user does not belong to any group")
         return _send_response("You do not belong to any group. Please contact Administrator")
 
     user_id = '%s-%s' % (team_id, user_id)
@@ -186,12 +183,12 @@ def list_accounts(user_id, team_id):
 
 def list_account(user_id, team_id):
 
-    print 'list_account'
-    print 'user_id = %s' % user_id
-    print 'team_id = %s' % team_id
+    print('list_account')
+    print('user_id = {}'.format(user_id))
+    print('team_id = {}'.format(team_id))
 
     if _authenticate(user_id, team_id) is None:
-        print 'no user found with %s-%s' % (team_id, user_id)
+        print('no user found with %s-%s' % (team_id, user_id))
         return _send_response("You're not allowed. Please contact the Administrator")
 
     user_id = '%s-%s' % (team_id, user_id)
@@ -207,12 +204,12 @@ def list_users(user_id, team_id):
 
 def list_user(user_id, team_id):
 
-    print 'list_user'
-    print 'user_id = %s' % user_id
-    print 'team_id = %s' % team_id
+    print('list_user')
+    print('user_id = {}'.format(user_id))
+    print('team_id = {}'.format(team_id))
 
     if _authenticate(user_id, team_id) is None:
-        print 'no user found with %s-%s' % (team_id, user_id)
+        print('no user found with %s-%s' % (team_id, user_id))
         return _send_response("You're not allowed. Please contact the Administrator")
 
     user_id = '%s-%s' % (team_id, user_id)
@@ -220,6 +217,6 @@ def list_user(user_id, team_id):
     items = user_controller.find_using_user_id(user_id, {})
     attachments = []
     for item in items:
-        print item
+        print(item)
         attachments.append({ "text": ' user: %s' % (item['name']) })
     return _send_response("%d user(s) found" % (len(items)), attachments)

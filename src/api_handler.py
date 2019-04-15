@@ -18,23 +18,23 @@ ALLOWED_RESOURCES = [
 
 def lambda_handler(event, context):
 
-    print 'Received event:\n%s' % event
+    print('Received event:\n{}'.format(event))
 
     method = event['httpMethod'].lower()
     paths = event['path'].split('/')
     path = paths[len(paths)-1]
     res_type = event.get('resType')
-    print 'method: %s' % method
-    print 'paths: %s' % paths
-    print 'path: %s' % path
-    print 'res_type: %s' % res_type
+    print('method: {}'.format(method))
+    print('paths: {}'.format(paths))
+    print('path: {}'.format(path))
+    print('res_type: {}'.format(res_type))
 
     if path == 'slash':
         return slash_handler(event, context)
 
     resource = path
     if resource not in ALLOWED_RESOURCES:
-        print "not supported resource, %s" % resource
+        print("not supported resource, {}".format(resource))
         raise Exception("not found")
 
     query_params = event.get('queryStringParameters')
@@ -50,11 +50,11 @@ def lambda_handler(event, context):
     params = post_data;
     if method == 'get':
         params = query_params;
-    print 'resource: %s' % resource
-    print 'parameters: %s' % params
+    print('resource: {}'.format(resource))
+    print('parameters: {}'.format(params))
 
     oper = params.get('oper')
-    print 'oper: %s' % oper
+    print('oper: {}'.format(oper
     if oper is None:
         if method == 'get':
             oper = 'find'
@@ -66,10 +66,10 @@ def lambda_handler(event, context):
             oper = 'delete'
     else:
         del params['oper']
-    print 'converted oper: %s' % oper
+    print('converted oper: {}'.format(oper))
 
     access_token = event['headers'].get('Authorization')
-    print 'access_token: %s' % access_token
+    print('access_token: {}'.format(access_token))
 
     # add 'access_token' to the params if the operation is 'authenticate' of auth controllers
     if access_token and oper == 'authenticate':
@@ -86,9 +86,9 @@ def lambda_handler(event, context):
             response['headers'] = { "Access-Control-Allow-Origin": "*" }
             response['body'] = json.dumps(ret)
         return response
-    except Exception, ex:
+    except Exception as ex:
         traceback.print_exc()
-        err_msg = '%s' % ex
+        err_msg = '{}'.format(ex
         if err_msg == 'not permitted':
             status_code = 401
         elif err_msg == 'unauthorized':
