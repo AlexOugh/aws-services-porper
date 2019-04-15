@@ -88,7 +88,7 @@ def lambda_handler(event, context):
         return response
     except Exception as ex:
         traceback.print_exc()
-        err_msg = '{}'.format(ex
+        err_msg = '{}'.format(ex)
         if err_msg == 'not permitted':
             status_code = 401
         elif err_msg == 'unauthorized':
