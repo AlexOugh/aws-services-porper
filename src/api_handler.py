@@ -54,7 +54,7 @@ def lambda_handler(event, context):
     print('parameters: {}'.format(params))
 
     oper = params.get('oper')
-    print('oper: {}'.format(oper
+    print('oper: {}'.format(oper))
     if oper is None:
         if method == 'get':
             oper = 'find'
