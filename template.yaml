@@ -201,7 +201,8 @@ Resources:
       Runtime: python3.6
       CodeUri: ./src
       Layers:
-        - !Ref PorperLambdaLayerARN
+        - Fn::ImportValue:
+            !Sub "${PorperLambdaLayerStackName}-PorperLambdaLayerArn"
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:
