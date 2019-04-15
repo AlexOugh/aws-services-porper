@@ -180,18 +180,12 @@ Resources:
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
           SLACK_REDIRECT_URI: !Ref RedirectUri
-          ACCESS_TOKEN_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-AccessTokenTableName"
-          GROUP_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-GroupTableName"
-          INVITED_USER_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-InvitedUserTableName"
-          PERMISSION_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-PermissionTableName"
-          USER_GROUP_REL_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-UserGroupTableName"
-          USER_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-UserTableName"
+          ACCESS_TOKEN_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-AccessTokenTableName"
+          GROUP_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-GroupTableName"
+          INVITED_USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-InvitedUserTableName"
+          PERMISSION_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-PermissionTableName"
+          USER_GROUP_REL_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserGroupTableName"
+          USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserTableName"
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
       Events:
         ProxyApiGreedy:
@@ -231,18 +225,12 @@ Resources:
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
           SLACK_REDIRECT_URI: !Ref RedirectUri
-          ACCESS_TOKEN_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-AccessTokenTableName"
-          GROUP_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-GroupTableName"
-          INVITED_USER_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-InvitedUserTableName"
-          PERMISSION_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-PermissionTableName"
-          USER_GROUP_REL_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-UserGroupTableName"
-          USER_TABLE_NAME: Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-UserTableName"
+          ACCESS_TOKEN_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-AccessTokenTableName"
+          GROUP_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-GroupTableName"
+          INVITED_USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-InvitedUserTableName"
+          PERMISSION_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-PermissionTableName"
+          USER_GROUP_REL_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserGroupTableName"
+          USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserTableName"
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
 Outputs:
   ApiUrl:
