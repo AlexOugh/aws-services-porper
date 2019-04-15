@@ -4,6 +4,9 @@ import traceback
 #from slash_handler import lambda_handler as slash_handler
 from handler import lambda_handler as handler
 
+import sys
+sys.path.append('./lib')
+
 ALLOWED_RESOURCES = [
     'github_auth',
     'google_auth',

@@ -13,6 +13,9 @@ from porper.controllers.permission_controller import PermissionController
 
 from aws_account_controller import AwsAccountController
 
+import sys
+sys.path.append('./lib')
+
 def lambda_handler(event, context):
 
     print('Received event:\n{}'.format(json.dumps(event)))
