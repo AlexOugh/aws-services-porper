@@ -91,13 +91,12 @@ Parameters:
     Type: String
     Default: "aws/codebuild/python:3.6.5-1.6.0"
     Description: Implemented Programming Language
-  S3SharedBucketName:
+  PorperLambdaLayerStackName:
+    Description: Name of the Porper Lambda Layer Stack
     Type: String
-    Default: ""
-    Description: S3 Bucket Name where the Artifact of this Build will be Copied
-  PorperLambdaLayerARN:
-    Type: String
-    Description: Porper Lambda Layer ARN
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
 
 Resources:
   CodeBuildServiceRole:
@@ -147,16 +146,6 @@ Resources:
                         - - "arn:aws:s3:::"
                           - !Ref InputArtifactS3Bucket
                           - "/*"
-                  -
-                    Effect: "Allow"
-                    Action:
-                      - "s3:*"
-                    Resource:
-                      - !Join
-                        - ''
-                        - - "arn:aws:s3:::"
-                          - !Ref S3SharedBucketName
-                          - "/*"
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -180,8 +169,6 @@ Resources:
           Value: !Ref AWS::Region
         - Name: AWS_ACCOUNT_ID
           Value: !Ref AWS::AccountId
-        - Name: S3_SHARED_BUCKET_NAME
-          Value: !Ref S3SharedBucketName
       Source:
         Type: CODEPIPELINE
       TimeoutInMinutes: 60
@@ -347,8 +334,8 @@ Resources:
                       - '"SlackSlashCommandToken": "'
                       - !Ref SlackSlashCommandToken
                       - '", '
-                      - '"PorperLambdaLayerARN": "'
-                      - !Ref PorperLambdaLayerARN
+                      - '"PorperLambdaLayerStackName": "'
+                      - !Ref PorperLambdaLayerStackName
                       - '" }'
                 TemplatePath: MyAppBuild::samTemplate.yaml
               RunOrder: 1
