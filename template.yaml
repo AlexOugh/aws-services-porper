@@ -83,102 +83,6 @@ Parameters:
     Description: Porper Lambda Layer ARN
 
 Resources:
-  UserTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref ReadCapacityUnit
-        WriteCapacityUnits: !Ref WriteCapacityUnit
-  GroupTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref ReadCapacityUnit
-        WriteCapacityUnits: !Ref WriteCapacityUnit
-  AccessTokenTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "access_token"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "access_token"
-          KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref ReadCapacityUnit
-        WriteCapacityUnits: !Ref WriteCapacityUnit
-  PermissionTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref ReadCapacityUnit
-        WriteCapacityUnits: !Ref WriteCapacityUnit
-  InvitedUserTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "email"
-          AttributeType: "S"
-        -
-          AttributeName: "auth_type"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "email"
-          KeyType: "HASH"
-        -
-          AttributeName: "auth_type"
-          KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref ReadCapacityUnit
-        WriteCapacityUnits: !Ref WriteCapacityUnit
-  UserGroupTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "user_id"
-          AttributeType: "S"
-        -
-          AttributeName: "group_id"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "user_id"
-          KeyType: "HASH"
-        -
-          AttributeName: "group_id"
-          KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref ReadCapacityUnit
-        WriteCapacityUnits: !Ref WriteCapacityUnit
   AWSAccountTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -193,38 +97,6 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref ReadCapacityUnit
         WriteCapacityUnits: !Ref WriteCapacityUnit
-  EncryptionDecryptionKey:
-    Type: AWS::KMS::Key
-    Properties:
-      Description: "Encryption and Decryption key for Lambda"
-      KeyPolicy:
-        Id: "LambdaEncDec"
-        Version: "2012-10-17"
-        Statement:
-          -
-            Sid: "Allow administration of the key"
-            Effect: "Allow"
-            Action:
-              - "kms:*"
-            Principal:
-              AWS: !Ref AWS::AccountId
-            Resource: '*'
-          -
-            Sid: "Allow Encryption Service to use this key"
-            Effect: "Allow"
-            Action:
-              - "kms:Encrypt"
-            Principal:
-              AWS: !GetAtt LambdaFunctionIAMRole.Arn
-            Resource: '*'
-          -
-            Sid: "Allow Decryption Service to use this key"
-            Effect: "Allow"
-            Action:
-              - "kms:Decrypt"
-            Principal:
-              AWS: !GetAtt LambdaFunctionIAMRole.Arn
-            Resource: '*'
   LambdaFunctionIAMRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -305,14 +177,6 @@ Resources:
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
           SLACK_REDIRECT_URI: !Ref RedirectUri
-          KMS_REGION: !Ref 'AWS::Region'
-          KMS_KEY_ID: !Ref EncryptionDecryptionKey
-          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
-          GROUP_TABLE_NAME: !Ref GroupTable
-          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
-          PERMISSION_TABLE_NAME: !Ref PermissionTable
-          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
-          USER_TABLE_NAME: !Ref UserTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
       Events:
         ProxyApiGreedy:
@@ -353,73 +217,7 @@ Resources:
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
           SLACK_REDIRECT_URI: !Ref RedirectUri
-          KMS_REGION: !Ref 'AWS::Region'
-          KMS_KEY_ID: !Ref EncryptionDecryptionKey
-          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
-          GROUP_TABLE_NAME: !Ref GroupTable
-          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
-          PERMISSION_TABLE_NAME: !Ref PermissionTable
-          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
-          USER_TABLE_NAME: !Ref UserTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
-  AuthorizerLambdaFunctionIAMRole:
-      Type: "AWS::IAM::Role"
-      Properties:
-          Path: "/"
-          AssumeRolePolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Sid: "AllowLambdaServiceToAssumeRole"
-                Effect: "Allow"
-                Action:
-                  - "sts:AssumeRole"
-                Principal:
-                  Service:
-                    - "lambda.amazonaws.com"
-          Policies:
-            -
-              PolicyName: "InlinePolicy"
-              PolicyDocument:
-                Version: "2012-10-17"
-                Statement:
-                  -
-                    Effect: "Allow"
-                    Action:
-                      - "logs:CreateLogGroup"
-                      - "logs:CreateLogStream"
-                      - "logs:PutLogEvents"
-                    Resource: "arn:aws:logs:*:*:*"
-                  -
-                    Effect: "Allow"
-                    Action:
-                      - "dynamodb:*"
-                    Resource: "*"
-  AuthorizerLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: SungardAS-Porper-Authorization
-      Handler: porper_authorizer.lambda_handler
-      Runtime: python2.7
-      CodeUri: ./src
-      Layers:
-        - !Ref PorperLambdaLayerARN
-      Role: !GetAtt AuthorizerLambdaFunctionIAMRole.Arn
-      Timeout: 300
-  InitializerLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: SungardAS-Porper-Initializer
-      Handler: init_dynamodb.lambda_handler
-      Runtime: python2.7
-      CodeUri: ./src
-      Layers:
-        - !Ref PorperLambdaLayerARN
-      Role: !GetAtt LambdaFunctionIAMRole.Arn
-      Timeout: 300
-      Environment:
-        Variables:
-          GROUP_TABLE_NAME: !Ref GroupTable
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
@@ -436,9 +234,3 @@ Outputs:
   LambdaFunctionArn:
     Description: "Lambda Function ARN"
     Value: !GetAtt LambdaFunction.Arn
-  AuthorizerLambdaFunctionArn:
-    Description: "Authorizer Lambda Function ARN"
-    Value: !GetAtt AuthorizerLambdaFunction.Arn
-  InitializerLambdaFunctionArn:
-    Description: "Initializer Lambda Function ARN"
-    Value: !GetAtt InitializerLambdaFunction.Arn
