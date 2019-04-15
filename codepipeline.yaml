@@ -87,14 +87,6 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: Slack Token for Slash Command
-  ReadCapacityUnit:
-    Description: Read Capacity Unit for DynamoDB Tables
-    Type: Number
-    Default: 5
-  WriteCapacityUnit:
-    Description: Write Capacity Unit for DynamoDB Tables
-    Type: Number
-    Default: 5
   ProjectImage:
     Type: String
     Default: "aws/codebuild/python:2.7.12"
@@ -103,6 +95,9 @@ Parameters:
     Type: String
     Default: ""
     Description: S3 Bucket Name where the Artifact of this Build will be Copied
+  PorperLambdaLayerARN:
+    Type: String
+    Description: Porper Lambda Layer ARN
 
 Resources:
   CodeBuildServiceRole:
@@ -352,11 +347,8 @@ Resources:
                       - '"SlackSlashCommandToken": "'
                       - !Ref SlackSlashCommandToken
                       - '", '
-                      - '"ReadCapacityUnit": "'
-                      - !Ref ReadCapacityUnit
-                      - '", '
-                      - '"WriteCapacityUnit": "'
-                      - !Ref WriteCapacityUnit
+                      - '"PorperLambdaLayerARN": "'
+                      - !Ref PorperLambdaLayerARN
                       - '" }'
                 TemplatePath: MyAppBuild::samTemplate.yaml
               RunOrder: 1
