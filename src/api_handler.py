@@ -1,7 +1,7 @@
 
 import json
 import traceback
-from slash_handler import lambda_handler as slash_handler
+#from slash_handler import lambda_handler as slash_handler
 from handler import lambda_handler as handler
 
 ALLOWED_RESOURCES = [
@@ -29,8 +29,8 @@ def lambda_handler(event, context):
     print('path: {}'.format(path))
     print('res_type: {}'.format(res_type))
 
-    if path == 'slash':
-        return slash_handler(event, context)
+    #if path == 'slash':
+    #    return slash_handler(event, context)
 
     resource = path
     if resource not in ALLOWED_RESOURCES:
