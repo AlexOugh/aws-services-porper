@@ -78,14 +78,107 @@ Parameters:
     Description: Write Capacity Unit for DynamoDB Tables
     Type: Number
     Default: 5
-  PorperLambdaLayerStackName:
-    Description: Name of the Porper Lambda Layer Stack
+  PorperLambdaLayerArn:
+    Description: Arn of the Porper Lambda Layer
     Type: String
-    MinLength: 1
-    MaxLength: 255
-    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
 
 Resources:
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  GroupTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  AccessTokenTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "access_token"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "access_token"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  PermissionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  InvitedUserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "email"
+          AttributeType: "S"
+        -
+          AttributeName: "auth_type"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "email"
+          KeyType: "HASH"
+        -
+          AttributeName: "auth_type"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  UserGroupTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "user_id"
+          AttributeType: "S"
+        -
+          AttributeName: "group_id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "user_id"
+          KeyType: "HASH"
+        -
+          AttributeName: "group_id"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
   AWSAccountTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -141,6 +234,62 @@ Resources:
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
                 Resource: "arn:aws:logs:*:*:*"
+  AuthorizerLambdaFunctionIAMRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action:
+                  - "sts:AssumeRole"
+                Principal:
+                  Service:
+                    - "lambda.amazonaws.com"
+          Policies:
+            -
+              PolicyName: "InlinePolicy"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource: "arn:aws:logs:*:*:*"
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "dynamodb:*"
+                    Resource: "*"
+  AuthorizerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: porper_authorizer.lambda_handler
+      Runtime: python3.6
+      CodeUri: ./src
+      Layers:
+        - !Ref PorperLambdaLayer
+      Role: !GetAtt AuthorizerLambdaFunctionIAMRole.Arn
+      Timeout: 300
+  InitializerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: init_dynamodb.lambda_handler
+      Runtime: python3.6
+      CodeUri: ./src
+      Layers:
+        - !Ref PorperLambdaLayer
+      Role: !GetAtt LambdaFunctionIAMRole.Arn
+      Timeout: 300
+      Environment:
+        Variables:
+          GROUP_TABLE_NAME: !Ref GroupTable
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -155,8 +304,7 @@ Resources:
       Runtime: python3.6
       CodeUri: ./src
       Layers:
-        - Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-PorperLambdaLayerArn"
+        - !Ref PorperLambdaLayerArn
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:
@@ -180,12 +328,12 @@ Resources:
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
           SLACK_REDIRECT_URI: !Ref RedirectUri
-          ACCESS_TOKEN_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-AccessTokenTableName"
-          GROUP_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-GroupTableName"
-          INVITED_USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-InvitedUserTableName"
-          PERMISSION_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-PermissionTableName"
-          USER_GROUP_REL_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserGroupTableName"
-          USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserTableName"
+          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
+          GROUP_TABLE_NAME: !Ref GroupTable
+          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
+          PERMISSION_TABLE_NAME: !Ref PermissionTable
+          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
+          USER_TABLE_NAME: !Ref UserTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
       Events:
         ProxyApiGreedy:
@@ -201,8 +349,7 @@ Resources:
       Runtime: python3.6
       CodeUri: ./src
       Layers:
-        - Fn::ImportValue:
-            !Sub "${PorperLambdaLayerStackName}-PorperLambdaLayerArn"
+        - !Ref PorperLambdaLayerArn
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:
@@ -226,12 +373,12 @@ Resources:
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SLASH_COMMAND_TOKEN: !Ref SlackSlashCommandToken
           SLACK_REDIRECT_URI: !Ref RedirectUri
-          ACCESS_TOKEN_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-AccessTokenTableName"
-          GROUP_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-GroupTableName"
-          INVITED_USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-InvitedUserTableName"
-          PERMISSION_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-PermissionTableName"
-          USER_GROUP_REL_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserGroupTableName"
-          USER_TABLE_NAME: !Sub "${PorperLambdaLayerStackName}-UserTableName"
+          ACCESS_TOKEN_TABLE_NAME: !Ref AccessTokenTable
+          GROUP_TABLE_NAME: !Ref GroupTable
+          INVITED_USER_TABLE_NAME: !Ref InvitedUserTable
+          PERMISSION_TABLE_NAME: !Ref PermissionTable
+          USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
+          USER_TABLE_NAME: !Ref UserTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
 Outputs:
   ApiUrl:
@@ -243,6 +390,12 @@ Outputs:
         - '.execute-api.'
         - !Ref 'AWS::Region'
         - '.amazonaws.com/Prod'
+  AuthorizerLambdaFunctionArn:
+    Description: "Authorizer Lambda Function ARN"
+    Value: !GetAtt AuthorizerLambdaFunction.Arn
+  InitializerLambdaFunctionArn:
+    Description: "Initializer Lambda Function ARN"
+    Value: !GetAtt InitializerLambdaFunction.Arn
   ProxyLambdaFunctionArn:
     Description: "Proxy Lambda Function ARN"
     Value: !GetAtt ProxyFunction.Arn

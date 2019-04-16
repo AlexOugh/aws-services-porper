@@ -91,12 +91,9 @@ Parameters:
     Type: String
     Default: "aws/codebuild/python:3.6.5-1.6.0"
     Description: Implemented Programming Language
-  PorperLambdaLayerStackName:
-    Description: Name of the Porper Lambda Layer Stack
+  PorperLambdaLayerArn:
+    Description: Arn of the Porper Lambda Layer
     Type: String
-    MinLength: 1
-    MaxLength: 255
-    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
 
 Resources:
   CodeBuildServiceRole:
@@ -334,8 +331,8 @@ Resources:
                       - '"SlackSlashCommandToken": "'
                       - !Ref SlackSlashCommandToken
                       - '", '
-                      - '"PorperLambdaLayerStackName": "'
-                      - !Ref PorperLambdaLayerStackName
+                      - '"PorperLambdaLayerArn": "'
+                      - !Ref PorperLambdaLayerArn
                       - '" }'
                 TemplatePath: MyAppBuild::samTemplate.yaml
               RunOrder: 1
