@@ -274,7 +274,7 @@ Resources:
       Runtime: python3.6
       CodeUri: ./src
       Layers:
-        - !Ref PorperLambdaLayer
+        - !Ref PorperLambdaLayerArn
       Role: !GetAtt AuthorizerLambdaFunctionIAMRole.Arn
       Timeout: 300
   InitializerLambdaFunction:
@@ -284,7 +284,7 @@ Resources:
       Runtime: python3.6
       CodeUri: ./src
       Layers:
-        - !Ref PorperLambdaLayer
+        - !Ref PorperLambdaLayerArn
       Role: !GetAtt LambdaFunctionIAMRole.Arn
       Timeout: 300
       Environment:
