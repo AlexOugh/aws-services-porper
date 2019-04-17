@@ -14,6 +14,7 @@
   <body>
     <div className="containter" style="margin-left:50px;margin-top:50px">
       <h3 className="text-left">Please Log In using your preference.</h3>
+      <h5 className="text-left">See <a href="./index.readme.html">here</a> to find how to get Client Ids of OAuth2 Providers.</h5>
       <p/>
 
       <div style="margin-left:70px;margin-top:20px;margin-right:100px">
@@ -21,13 +22,14 @@
           <input type="text" class="form-control" placeholder="Redirect URL" id="redirect_url" aria-describedby="basic-addon1">
         </div>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Porper API Server" id="porper_url" aria-describedby="basic-addon1">
+          <input type="text" class="form-control" placeholder="Porper API Server (You can get this value from 'ApiUrl' in Outputs of 'SungardAs-aws-services-porper' stack)" id="porper_url" aria-describedby="basic-addon1">
         </div>
       </div>
       <br/>
 
       <div style="margin-left:70px;margin-top:20px;margin-right:100px">
         <label for="basic-url"><H5>Google Authentication</H5></label>
+        <div class="input-group mb-3">Enter 'Client ID' and refresh this page to see the 'SignIn' button.</div>
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Client ID" id="google_client_id" aria-describedby="basic-addon1">
         </div>
