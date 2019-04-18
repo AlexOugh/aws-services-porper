@@ -12,6 +12,7 @@ ALLOWED_RESOURCES = [
     'google_auth',
     'slack_auth',
     'sso_auth',
+    'cognito_auth',
     'group',
     'user',
     'invited_user',

@@ -5,6 +5,7 @@ from porper.controllers.auth_controller import AuthController
 from porper.controllers.github_auth_controller import GithubAuthController
 from porper.controllers.google_auth_controller import GoogleAuthController
 from porper.controllers.slack_auth_controller import SlackAuthController
+from porper.controllers.cognito_auth_controller import CognitoAuthController
 from porper.controllers.sso_auth_controller import SsoAuthController
 from porper.controllers.group_controller import GroupController
 from porper.controllers.user_controller import UserController

@@ -15,10 +15,11 @@ def lambda_handler(event, context):
         dynamodb = boto3.resource('dynamodb', region_name=region)
         group = Group(dynamodb)
 
-        params = {'id': 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'name': 'admin'}
+        from porper.controller.meta_resource_controller import ADMIN_GROUP_ID, PUBLIC_GROUP_ID
+        params = {'id': ADMIN_GROUP_ID, 'name': 'admin'}
         group.create(params)
 
-        params = {'id': '435a6417-6c1f-4d7c-87dd-e8f6c0effc7a', 'name': 'public'}
+        params = {'id': PUBLIC_GROUP_ID, 'name': 'public'}
         group.create(params)
 
         response = { 'statusCode': 200 };
