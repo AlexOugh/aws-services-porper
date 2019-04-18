@@ -44,12 +44,12 @@ def lambda_handler(event, context):
     query_params = event.get('queryStringParameters')
     if not query_params:
         query_params = {}
-    elif isinstance(query_params, str) or isinstance(query_params, unicode):
+    elif isinstance(query_params, basestring):
         query_params = json.loads(query_params)
     post_data = event.get('body')
     if not post_data:
         post_data = {}
-    elif isinstance(post_data, str) or isinstance(post_data, unicode):
+    elif isinstance(post_data, basestring):
         post_data = json.loads(post_data)
     params = post_data;
     if method == 'get':
