@@ -53,7 +53,7 @@ def lambda_handler(event, context):
     print(ret)
 
     # send an sign up email
-    if resource == 'invited_user' and (oper == "post" or oper == "put"):
+    if resource == 'invited_user' and (oper == "create" or oper == "update"):
         try:
             send_email(params['email'])
         except Exception as ex:
