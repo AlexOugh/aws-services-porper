@@ -81,6 +81,24 @@ Parameters:
   PorperLambdaLayerArn:
     Description: Arn of the Porper Lambda Layer
     Type: String
+  SMTPServer:
+    Type: String
+    Description: SMTP Server
+  SMTPPort:
+    Type: String
+    Description: SMTP Port
+  SMTPUsername:
+    Type: String
+    Description: SMTP Username
+  SMTPPassword:
+    Type: String
+    Description: SMTP Password
+  SignUpSender:
+    Type: String
+    Description: Email address of who sends the sign up email
+  SignUpServer:
+    Type: String
+    Description: Sign up page url
 
 Resources:
   UserTable:
@@ -335,6 +353,12 @@ Resources:
           USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
           USER_TABLE_NAME: !Ref UserTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
+          SMTP_SERVER: !Ref SMTPServer
+          SMTP_PORT: !Ref SMTPPort
+          SMTP_USERNAME: !Ref SMTPUsername
+          SMTP_PASSWORD: !Ref SMTPPassword
+          SIGN_UP_SENDER: !Ref SignUpSender
+          SIGN_UP_SERVER: !Ref SignUpServer
       Events:
         ProxyApiGreedy:
           Type: Api
@@ -380,6 +404,12 @@ Resources:
           USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
           USER_TABLE_NAME: !Ref UserTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
+          SMTP_SERVER: !Ref SMTPServer
+          SMTP_PORT: !Ref SMTPPort
+          SMTP_USERNAME: !Ref SMTPUsername
+          SMTP_PASSWORD: !Ref SMTPPassword
+          SIGN_UP_SENDER: !Ref SignUpSender
+          SIGN_UP_SERVER: !Ref SignUpServer
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint

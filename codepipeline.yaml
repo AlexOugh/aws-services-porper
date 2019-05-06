@@ -94,6 +94,24 @@ Parameters:
   PorperLambdaLayerArn:
     Description: Arn of the Porper Lambda Layer
     Type: String
+  SMTPServer:
+    Type: String
+    Description: SMTP Server
+  SMTPPort:
+    Type: String
+    Description: SMTP Port
+  SMTPUsername:
+    Type: String
+    Description: SMTP Username
+  SMTPPassword:
+    Type: String
+    Description: SMTP Password
+  SignUpSender:
+    Type: String
+    Description: Email address of who sends the sign up email
+  SignUpServer:
+    Type: String
+    Description: Sign up page url
 
 Resources:
   CodeBuildServiceRole:
@@ -283,9 +301,6 @@ Resources:
                 ParameterOverrides: !Join
                     - ''
                     - - '{ '
-                      - '"GoogleTokeninfoEndpoint": "'
-                      - !Ref GoogleTokeninfoEndpoint
-                      - '", '
                       - '"GoogleClientId": "'
                       - !Ref GoogleClientId
                       - '", '
@@ -304,23 +319,11 @@ Resources:
                       - '"SsoClientSecret": "'
                       - !Ref SsoClientSecret
                       - '", '
-                      - '"GithubAuthEndpoint": "'
-                      - !Ref GithubAuthEndpoint
-                      - '", '
-                      - '"GithubApiEndpoint": "'
-                      - !Ref GithubApiEndpoint
-                      - '", '
                       - '"GithubClientId": "'
                       - !Ref GithubClientId
                       - '", '
                       - '"GithubClientSecret": "'
                       - !Ref GithubClientSecret
-                      - '", '
-                      - '"SlackAuthEndpoint": "'
-                      - !Ref SlackAuthEndpoint
-                      - '", '
-                      - '"SlackApiEndpoint": "'
-                      - !Ref SlackApiEndpoint
                       - '", '
                       - '"SlackClientId": "'
                       - !Ref SlackClientId
@@ -328,11 +331,26 @@ Resources:
                       - '"SlackClientSecret": "'
                       - !Ref SlackClientSecret
                       - '", '
-                      - '"SlackSlashCommandToken": "'
-                      - !Ref SlackSlashCommandToken
-                      - '", '
                       - '"PorperLambdaLayerArn": "'
                       - !Ref PorperLambdaLayerArn
+                      - '", '
+                      - '"SMTPServer": "'
+                      - !Ref SMTPServer
+                      - '", '
+                      - '"SMTPPort": "'
+                      - !Ref SMTPPort
+                      - '", '
+                      - '"SMTPUsername": "'
+                      - !Ref SMTPUsername
+                      - '", '
+                      - '"SMTPPassword": "'
+                      - !Ref SMTPPassword
+                      - '", '
+                      - '"SignUpSender": "'
+                      - !Ref SignUpSender
+                      - '", '
+                      - '"SignUpServer": "'
+                      - !Ref SignUpServer
                       - '" }'
                 TemplatePath: MyAppBuild::samTemplate.yaml
               RunOrder: 1
