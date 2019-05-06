@@ -179,6 +179,34 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref ReadCapacityUnit
         WriteCapacityUnits: !Ref WriteCapacityUnit
+  RoleTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
+  FunctionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnit
+        WriteCapacityUnits: !Ref WriteCapacityUnit
   AWSAccountTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -334,6 +362,8 @@ Resources:
           PERMISSION_TABLE_NAME: !Ref PermissionTable
           USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
           USER_TABLE_NAME: !Ref UserTable
+          ROLE_TABLE_NAME: !Ref RoleTable
+          FUNCTION_TABLE_NAME: !Ref FunctionTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
       Events:
         ProxyApiGreedy:
@@ -379,6 +409,8 @@ Resources:
           PERMISSION_TABLE_NAME: !Ref PermissionTable
           USER_GROUP_REL_TABLE_NAME: !Ref UserGroupTable
           USER_TABLE_NAME: !Ref UserTable
+          ROLE_TABLE_NAME: !Ref RoleTable
+          FUNCTION_TABLE_NAME: !Ref FunctionTable
           AWS_ACCOUNT_TABLE_NAME: !Ref AWSAccountTable
 Outputs:
   ApiUrl:
