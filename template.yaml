@@ -92,6 +92,7 @@ Parameters:
     Description: SMTP Username
   SMTPPassword:
     Type: String
+    NoEcho: true
     Description: SMTP Password
   SignUpSender:
     Type: String

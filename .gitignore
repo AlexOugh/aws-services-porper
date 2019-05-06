@@ -3,7 +3,9 @@ __*
 *.pyc
 samTemplate.yaml
 .*.local
+bin
+include
 lib
 !lib/setup.cfg
-tests
 json
+.Python

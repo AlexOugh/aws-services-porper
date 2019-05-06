@@ -17,7 +17,9 @@ ALLOWED_RESOURCES = [
     'user',
     'invited_user',
     'aws_account',
-    'permission'
+    'permission',
+    'role',
+    'function'
 ]
 
 def lambda_handler(event, context):
