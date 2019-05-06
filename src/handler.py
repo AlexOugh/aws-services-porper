@@ -11,6 +11,8 @@ from porper.controllers.group_controller import GroupController
 from porper.controllers.user_controller import UserController
 from porper.controllers.invited_user_controller import InvitedUserController
 from porper.controllers.permission_controller import PermissionController
+from porper.controllers.function_controller import FunctionController
+from porper.controllers.role_controller import RoleController
 
 from aws_account_controller import AwsAccountController
 
