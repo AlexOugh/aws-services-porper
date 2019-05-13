@@ -273,6 +273,7 @@ Resources:
                   - "dynamodb:UpdateItem"
                   - "kms:Encrypt"
                   - "kms:Decrypt"
+                  - "cognito-idp:*"
                 Resource: "*"
               -
                 Effect: "Allow"
