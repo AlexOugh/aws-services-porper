@@ -91,9 +91,9 @@ Parameters:
     Type: String
     Default: "aws/codebuild/python:3.6.5-1.6.0"
     Description: Implemented Programming Language
-  PorperLayerStackName:
-    Description: Name of the Porper Lambda Layer Stack
-    Type: String
+  # PorperLayerStackName:
+  #   Description: Name of the Porper Lambda Layer Stack
+  #   Type: String
   SMTPServer:
     Type: String
     Description: SMTP Server
@@ -333,7 +333,7 @@ Resources:
                       - !Ref SlackClientSecret
                       - '", '
                       - '"PorperLambdaLayerArn": "'
-                      - !ImportValue ${PorperLayerStackName}-PorperLambdaLayerArn
+                      - !ImportValue SungardAS-porper-core-PorperLambdaLayerArn
                       - '", '
                       - '"SMTPServer": "'
                       - !Ref SMTPServer
