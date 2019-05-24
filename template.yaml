@@ -354,6 +354,7 @@ Resources:
       Layers:
         - !Ref PorperLambdaLayerArn
       Role: !GetAtt LambdaFunctionIAMRole.Arn
+      MemorySize: 1024
       Timeout: 300
       Environment:
         Variables:
