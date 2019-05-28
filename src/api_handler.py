@@ -26,7 +26,8 @@ ALLOWED_RESOURCES = [
     'permission',
     'role',
     'function',
-    'token'
+    'token',
+    'user_group'
 ]
 
 def lambda_handler(event, context):
