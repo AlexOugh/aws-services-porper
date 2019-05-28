@@ -43,7 +43,7 @@ sys.path.append('./lib')
 
 def lambda_handler(event, context):
 
-    logger.info(f'Received event: {json.dumps(event)}')
+    logger.info(f'Received event: {event}')
 
     access_token = event.get('access_token')
     resource = event['resource']
@@ -60,14 +60,14 @@ def lambda_handler(event, context):
     else:
         if not access_token:    raise Exception("unauthorized")
         ret = getattr(controller, oper)(access_token, params)
-    print(ret)
+    logger.info(f'AuthController response={ret}')
 
     # send an sign up email
     if resource == 'invited_user' and (oper == "create" or oper == "update"):
         try:
             send_email(params['email'])
         except Exception as ex:
-            print(ex)
+            logger.info(f'Exception={ex}')
     return ret
 
 
