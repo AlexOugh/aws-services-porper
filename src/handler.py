@@ -59,7 +59,7 @@ def lambda_handler(event, context):
         ret = getattr(controller, oper)(params)
     elif isinstance(controller, GroupController):
         if not access_token:    raise Exception("unauthorized")
-        ret = getattr(controller, oper)(access_token, params, paths)
+        ret = getattr(controller, oper)(access_token, params, event['paths'])
     else:
         if not access_token:    raise Exception("unauthorized")
         ret = getattr(controller, oper)(access_token, params)
