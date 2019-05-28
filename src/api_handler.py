@@ -6,6 +6,12 @@ from handler import lambda_handler as handler
 
 import sys
 sys.path.append('./lib')
+import aws_lambda_logging
+import logging
+
+logger = logging.getLogger()
+loglevel = "INFO"
+logging.basicConfig(level=logging.ERROR)
 
 ALLOWED_RESOURCES = [
     'github_auth',
@@ -24,24 +30,25 @@ ALLOWED_RESOURCES = [
 ]
 
 def lambda_handler(event, context):
+    aws_lambda_logging.setup(level=loglevel)
 
-    print('Received event:\n{}'.format(event))
+    logger.info(f'Received event:{event}')
 
     method = event['httpMethod'].lower()
     paths = event['path'].split('/')
     path = paths[len(paths)-1]
     res_type = event.get('resType')
-    print('method: {}'.format(method))
-    print('paths: {}'.format(paths))
-    print('path: {}'.format(path))
-    print('res_type: {}'.format(res_type))
+    logger.info(f'method: {method}')
+    logger.info(f'paths: {paths}'
+    logger.info(f'path: {path}')
+    logger.info(f'res_type: {res_type}')
 
     #if path == 'slash':
     #    return slash_handler(event, context)
 
     resource = path
     if resource not in ALLOWED_RESOURCES:
-        print("not supported resource, {}".format(resource))
+        logger.info(f"not supported resource, {resource}")
         raise Exception("not found")
 
     query_params = event.get('queryStringParameters')
@@ -57,11 +64,11 @@ def lambda_handler(event, context):
     params = post_data;
     if method == 'get':
         params = query_params;
-    print('resource: {}'.format(resource))
-    print('parameters: {}'.format(params))
+    logger.info(f'resource: {resource}')
+    logger.info(f'parameters: {params}')
 
     oper = params.get('oper')
-    print('oper: {}'.format(oper))
+    logger.info(f'oper: {oper}')
     if oper is None:
         if method == 'get':
             oper = 'find'
@@ -73,10 +80,10 @@ def lambda_handler(event, context):
             oper = 'delete'
     else:
         del params['oper']
-    print('converted oper: {}'.format(oper))
+    logger.info(f'converted oper: {oper}')
 
     access_token = event['headers'].get('Authorization')
-    print('access_token: {}'.format(access_token))
+    logger.info(f'access_token: {access_token}')
 
     # add 'access_token' to the params if the operation is 'authenticate' of auth controllers
     if access_token and oper == 'authenticate':

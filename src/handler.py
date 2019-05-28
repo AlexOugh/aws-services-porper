@@ -16,6 +16,13 @@ from porper.controllers.role_controller import RoleController
 from porper.controllers.token_controller import TokenController
 
 from aws_account_controller import AwsAccountController
+import aws_lambda_logging
+import logging
+
+logger = logging.getLogger()
+loglevel = "INFO"
+logging.basicConfig(level=logging.ERROR)
+aws_lambda_logging.setup(level=loglevel)
 
 import os
 smtp_server = os.environ.get('SMTP_SERVER')
@@ -24,18 +31,17 @@ smtp_username = os.environ.get('SMTP_USERNAME')
 smtp_password = os.environ.get('SMTP_PASSWORD')
 signup_sender = os.environ.get('SIGN_UP_SENDER')
 signup_server = os.environ.get('SIGN_UP_SERVER')
-print(smtp_server)
-print(smtp_port)
-print(smtp_username)
-print(smtp_password)
-print(signup_sender)
-print(signup_server)
+logger.info(f'smtp_server={smtp_server}')
+logger.info(f'smtp_port={smtp_port}')
+logger.info(f'smtp_username={smtp_username}')
+logger.info(f'smtp_password={smtp_password}')
+logger.info(f'signup_sender={signup_sender}')
+logger.info(f'signup_server={signup_server}')
 
 import sys
 sys.path.append('./lib')
 
 def lambda_handler(event, context):
-
     print('Received event:\n{}'.format(json.dumps(event)))
 
     access_token = event.get('access_token')
