@@ -36,7 +36,7 @@ def lambda_handler(event, context):
 
     method = event['httpMethod'].lower()
     paths = event['path'].split('/')
-    path = paths[len(paths)-1]
+    path = paths[1]
     res_type = event.get('resType')
     logger.info(f'method: {method}')
     logger.info(f'paths: {paths}')
@@ -89,7 +89,7 @@ def lambda_handler(event, context):
     if access_token and oper == 'authenticate':
         params['access_token'] = access_token
 
-    handler_event = {'access_token': access_token, 'resource': resource, 'oper': oper, 'params': json.dumps(params)}
+    handler_event = {'paths': paths,'access_token': access_token, 'resource': resource, 'oper': oper, 'params': json.dumps(params)}
 
     try:
         ret = handler(handler_event, context)

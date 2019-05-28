@@ -57,6 +57,9 @@ def lambda_handler(event, context):
     controller = globals()['%sController' % resource.title().replace('_', '')](dynamodb)
     if isinstance(controller, AuthController):
         ret = getattr(controller, oper)(params)
+    elif isinstance(controller, GroupController):
+        if not access_token:    raise Exception("unauthorized")
+        ret = getattr(controller, oper)(access_token, params, paths)
     else:
         if not access_token:    raise Exception("unauthorized")
         ret = getattr(controller, oper)(access_token, params)
