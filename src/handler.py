@@ -42,6 +42,7 @@ import sys
 sys.path.append('./lib')
 
 def lambda_handler(event, context):
+
     print('Received event:\n{}'.format(json.dumps(event)))
 
     access_token = event.get('access_token')

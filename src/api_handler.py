@@ -39,7 +39,7 @@ def lambda_handler(event, context):
     path = paths[len(paths)-1]
     res_type = event.get('resType')
     logger.info(f'method: {method}')
-    logger.info(f'paths: {paths}'
+    logger.info(f'paths: {paths}')
     logger.info(f'path: {path}')
     logger.info(f'res_type: {res_type}')
 
