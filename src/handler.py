@@ -92,7 +92,10 @@ def send_email(to_addr):
     # message to be sent
     from_addr = signup_sender
     subject = "Welcome to AFactor Application!"
-    body = "Please click this link to sign up, https://{}/auth/sign-up?email={}".format(signup_server, to_addr)
+    if to_addr.endswith('@sungardas.com'):
+        body = "Please click this link to sign in, https://{}".format(signup_server)
+    else:
+        body = "Please click this link to sign up, https://{}/auth/sign-up?email={}".format(signup_server, to_addr)
 
     message = """From: {}\nTo: {}\nSubject: {}\n\n{}
     """.format(from_addr, to_addr, subject, body)
