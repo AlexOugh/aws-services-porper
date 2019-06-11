@@ -3,6 +3,7 @@ import json
 import os
 import boto3
 import traceback
+import uuid
 
 from porper.models.group import Group
 
@@ -15,11 +16,10 @@ def lambda_handler(event, context):
         dynamodb = boto3.resource('dynamodb', region_name=region)
         group = Group(dynamodb)
 
-        from porper.controllers.meta_resource_controller import ADMIN_GROUP_ID, PUBLIC_GROUP_ID
-        params = {'id': ADMIN_GROUP_ID, 'name': 'admin'}
+        params = {'id': str(uuid.uuid4()), 'name': 'admin'}
         group.create(params)
 
-        params = {'id': PUBLIC_GROUP_ID, 'name': 'public'}
+        params = {'id': str(uuid.uuid4()), 'name': 'public'}
         group.create(params)
 
         response = { 'statusCode': 200 };
