@@ -16,7 +16,7 @@ from porper.controllers.role_controller import RoleController
 from porper.controllers.token_controller import TokenController
 from porper.controllers.user_group_controller import UserGroupController
 
-from aws_account_controller import AwsAccountController
+#from aws_account_controller import AwsAccountController
 import aws_lambda_logging
 import logging
 
