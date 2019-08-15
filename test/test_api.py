@@ -1058,7 +1058,7 @@ if __name__ == '__main__':
 
 
     # suite.addTest(ProxyUserTest("test_user_get", env))
-    # #suite.addTest(ProxyUserTest("test_get_user_customer", env))
+    # #suite.addTest(ProxyUserTest("test_get_user_customer", env))  -- we do not need this
 
     # suite.addTest(ProxyGroupTest("test_group_post", env))
     # suite.addTest(ProxyGroupTest("test_group_put", env))
@@ -1070,6 +1070,8 @@ if __name__ == '__main__':
     # suite.addTest(ProxyFunctionTest("test_post_function",env))
 
     # suite.addTest(ProxyAuthInviteTest("test_post_auth_invite", env))
+
+    ######## above this, all test cases are succeeded
 
     suite.addTest(ProxyAuthGroupTest("test_group_get_customer_id", env))
     # suite.addTest(ProxyAuthGroupTest("test_group_get_role", env))
