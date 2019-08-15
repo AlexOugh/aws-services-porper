@@ -14,20 +14,20 @@ loglevel = "INFO"
 logging.basicConfig(level=logging.ERROR)
 
 ALLOWED_RESOURCES = [
-    'github_auth',
-    'google_auth',
-    'slack_auth',
+    #'github_auth',
+    #'google_auth',
+    #'slack_auth',
     'sso_auth',
     'cognito_auth',
     'group',
     'user',
     'invited_user',
-    'aws_account',
+    #'aws_account',
     'permission',
     'role',
     'function',
-    'token',
-    'user_group'
+    # 'token',
+    #'user_group'
 ]
 
 def lambda_handler(event, context):

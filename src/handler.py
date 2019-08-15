@@ -2,9 +2,9 @@
 import json
 
 from porper.controllers.auth_controller import AuthController
-from porper.controllers.github_auth_controller import GithubAuthController
-from porper.controllers.google_auth_controller import GoogleAuthController
-from porper.controllers.slack_auth_controller import SlackAuthController
+# from porper.controllers.github_auth_controller import GithubAuthController
+# from porper.controllers.google_auth_controller import GoogleAuthController
+# from porper.controllers.slack_auth_controller import SlackAuthController
 from porper.controllers.cognito_auth_controller import CognitoAuthController
 from porper.controllers.sso_auth_controller import SsoAuthController
 from porper.controllers.group_controller import GroupController
@@ -13,8 +13,8 @@ from porper.controllers.invited_user_controller import InvitedUserController
 from porper.controllers.permission_controller import PermissionController
 from porper.controllers.function_controller import FunctionController
 from porper.controllers.role_controller import RoleController
-from porper.controllers.token_controller import TokenController
-from porper.controllers.user_group_controller import UserGroupController
+# from porper.controllers.token_controller import TokenController
+# from porper.controllers.user_group_controller import UserGroupController
 
 #from aws_account_controller import AwsAccountController
 import aws_lambda_logging
@@ -52,19 +52,30 @@ def lambda_handler(event, context):
     params = json.loads(event['params'])
 
     import os
-    import boto3
-    region = os.environ.get('AWS_DEFAULT_REGION')
-    dynamodb = boto3.resource('dynamodb', region_name=region)
-    controller = globals()['%sController' % resource.title().replace('_', '')](dynamodb)
+    # import boto3
+    # region = os.environ.get('AWS_DEFAULT_REGION')
+    # dynamodb = boto3.resource('dynamodb', region_name=region)
+    # controller = globals()['%sController' % resource.title().replace('_', '')](dynamodb)
+    controller = globals()['%sController' % resource.title().replace('_', '')]()
     if isinstance(controller, AuthController):
-        ret = getattr(controller, oper)(params)
-    elif isinstance(controller, GroupController):
-        if not access_token:    raise Exception("unauthorized")
-        ret = getattr(controller, oper)(access_token, params, event['paths'])
+        try:
+            ret = getattr(controller, oper)(params)
+            controller.commit()
+        except Exception as ex:
+            controller.rollback()
+            raise ex
+    # elif isinstance(controller, GroupController):
+    #     if not access_token:    raise Exception("unauthorized")
+    #     ret = getattr(controller, oper)(access_token, params, event['paths'])
     else:
         if not access_token:    raise Exception("unauthorized")
-        ret = getattr(controller, oper)(access_token, params)
-    logger.info(f'AuthController response={ret}')
+        try:
+            ret = getattr(controller, oper)(access_token, params)
+            controller.commit()
+        except Exception as ex:
+            controller.rollback()
+            raise ex
+    logger.info(f'Controller response={ret}')
 
     # send an sign up email
     if resource == 'invited_user' and (oper == "create" or oper == "update"):
